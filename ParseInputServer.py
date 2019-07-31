@@ -6,9 +6,10 @@
 # with the text "Balloon" in the HTTP response body.
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import urllib.parse as uli
 
 
-class EchoHandler(BaseHTTPRequestHandler):
+class ParseInputHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # First, send a 200 OK response.
         self.send_response(200)
@@ -18,10 +19,11 @@ class EchoHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         # Now, write the response body.
-        
-        self.wfile.write(self.path.replace("/","").encode())
+        input_dict=uli.parse_qs(self.path[2:])
+        self.wfile.write(str(input_dict).encode())
+
 
 if __name__ == '__main__':
     server_address = ('', 8000)  # Serve on all addresses, port 8000.
-    httpd = HTTPServer(server_address, EchoHandler)
+    httpd = HTTPServer(server_address, ParseInputHandler)
     httpd.serve_forever()
