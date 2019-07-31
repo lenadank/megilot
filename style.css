@@ -1,15 +1,22 @@
 .view {
     height: 100vh;
 }
+
 .form-group {
-    color:rgb(219, 219, 219);
+    color: rgb(219, 219, 219);
 }
-button{
+
+.basic-backgroud{
+    background: black;
+}
+
+button {
     background-color: rgb(241, 133, 32);
     border-radius: 4px;
     padding: 10px 24px;
-    border:none;
+    border: none;
 }
-button:hover{
+
+button:hover {
     background-color: rgb(255, 152, 56);
 }
