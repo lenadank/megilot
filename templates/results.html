@@ -1,15 +1,17 @@
 {% extends 'layout.html' %}
 
+<!-- replace description with a search bar to enable search from the results page -->
 {% block description %}
 <div class="container-fluid" style='padding-top:10px; padding-bottom:20px'>
     <div class="row">
         <div class="col-lg-12">
-            <form class="row form d-flex flex-row-reverse align-items-end" role='form' action="{{url_for('search')}}" method="POST">
+            <form class="row form d-flex flex-row-reverse align-items-end" role='form' action="{{url_for('search')}}"
+                method="POST">
                 <div class="col-lg-2 col-md-4">
                     <div class="form-group text-right" dir="rtl">
                         <label for="text">אותיות ראשונות:</label>
-                        <input class="form-control" type="text" name="first-letters" id="first-letters" placeholder="למשל אבח"
-                            required="" value={{first_letters}}>
+                        <input class="form-control" type="text" name="first-letters" id="first-letters"
+                            placeholder="למשל אבח" required="" value={{first_letters}}>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-4">
@@ -33,14 +35,14 @@
                 <div class="col-lg-5 col-md-10">
                     <div class="form-group text-right">
                         <label class="text-right" dir='rtl'>קישור לטקסט:</label>
-                        <input class="form-control" type="text" name="text-url" id="text-url" placeholder="https://www.google.com"
-                            required="" value={{txt_url}} type="url">
+                        <input class="form-control" type="text" name="text-url" id="text-url"
+                            placeholder="https://www.google.com" required="" value={{txt_url}} type="url">
                     </div>
                 </div>
                 <div class="col-lg-1 col-md-2">
                     <div class="form-group" dir="rtl">
                         </br>
-                        <button id = "search" type="submit">חפש\י</button>
+                        <button class="custom-button" id="search" type="submit">חפש\י</button>
                     </div>
                 </div>
             </form>
@@ -49,11 +51,21 @@
 </div>
 {% endblock description %}
 
+<!-- add all search results to page as cards -->
 {% block content %}
-<div class='container text-light text-center'>
-    <p>{{first_letters}}</p>
-    <p>{{last_letters}}</p>
-    <p>{{txt_length}}</p>
-    <p>{{txt_url}}</p>
+<div class='container text-light text-right'>
+    <div class="row">
+        {% for line in lines %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100" style='background-color: rgba(255, 255, 255, 0.85); color: black'>
+                <div class="card-body">
+                    <h5 class="card-title">{{line.title}}</h5>
+                    <p class="card-text">{{line.text}}</p>
+                    <a href="#">ראה מקטע מלא</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock content %}
