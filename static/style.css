@@ -11,12 +11,76 @@ body {
     color: rgb(241, 241, 241)
 }
 
+a{
+    color:#2e80b6
+}
+
 .container-fluid {
     padding-top: 10px;
     padding-bottom: 20px;
 }
 
-.container .row .card{
-    background-color: rgba(255, 255, 255, 0.85); 
+.container .row .card {
+    background-color: rgba(255, 255, 255, 0.85);
     color: black;
+}
+
+.snip1431 {
+    border: none;
+    background-color: #ff951c;
+    color: black;
+    cursor: pointer;
+    padding: 0px 25px;
+    display: inline-block;
+    margin: 0px;
+    text-transform: uppercase;
+    line-height: 38px;
+    font-weight: 400;
+    font-size: 1.1em;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;    
+    -webkit-transform: translateZ(0);
+    -webkit-transition: all 0.35s ease;
+    transition: all 0.35s ease;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.snip1431:before {
+    opacity: 0;
+    content: "";
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    border-radius: inherit;
+    background-color: #ffffff;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+}
+
+.snip1431:after {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    content: '';
+    border-radius: inherit;
+}
+
+.snip1431:hover, .snip1431.hover {
+    background-color: #ff951c;
+    color: black;
+}
+
+.snip1431:hover:before, .snip1431.hover:before {
+    -webkit-transform: translateX(0%);
+    transform: translateX(0%);
+    opacity: 0.25;
 }
