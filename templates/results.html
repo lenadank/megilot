@@ -1,4 +1,54 @@
 {% extends 'layout.html' %}
+
+{% block description %}
+<div class="container-fluid" style='padding-top:10px; padding-bottom:20px'>
+    <div class="row">
+        <div class="col-lg-12">
+            <form class="row form d-flex flex-row-reverse align-items-end" role='form' action="{{url_for('search')}}" method="POST">
+                <div class="col-lg-2 col-md-4">
+                    <div class="form-group text-right" dir="rtl">
+                        <label for="text">אותיות ראשונות:</label>
+                        <input class="form-control" type="text" name="first-letters" id="first-letters" placeholder="למשל אבח"
+                            required="" value={{first_letters}}>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <div class="form-group text-right" dir="rtl">
+                        <label for="text">אותיות אחרונות:</label>
+                        <input class="form-control" type="text" name="last-letters" id="last-letters"
+                            placeholder="למשל בגד" value={{last_letters}} required="">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <div class="form-group text-right" dir="rtl">
+                        <label for="number" class="text-right">מספר תווים:</label>
+                        <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
+                            <option>0-50</option>
+                            <option>50-100</option>
+                            <option>100-150</option>
+                            <option>150-200</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="form-group text-right">
+                        <label class="text-right" dir='rtl'>קישור לטקסט:</label>
+                        <input class="form-control" type="text" name="text-url" id="text-url" placeholder="https://www.google.com"
+                            required="" value={{txt_url}} type="url">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-2">
+                    <div class="form-group" dir="rtl">
+                        </br>
+                        <button id = "search" type="submit">חפש\י</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock description %}
+
 {% block content %}
 <div class='container text-light text-center'>
     <p>{{first_letters}}</p>
