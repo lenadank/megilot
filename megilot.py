@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from urllib.parse import urlencode, parse_qs
+import searchUtils
 app = Flask(__name__)
-
-easy="שלום"
-lines = [{'title':easy[0:3]},{'title': "Hey", 'text': "The well-documented monihvkhvkhdvhckvsdkcvdskjcvsdjlvcdljhcvdlcvhdcjlvdsljcvdsjcvsdhcvsdjlvcdschvsljcvlhsdvcjlsdvcdsvcjlvdscjvdscljvdschjsvdcljsvhsvlchvsdljvdscljvcjsdvclsdvcljsvdcjhvscljshtor backs into the incomplete bed. What if the flashy quarter ate the dress?"}, {'title': "How", 'text': "The well-documented monitor backs into the incomplete bed. What if the flashy quarter ate the dress?"}, {'title': "Hi", 'text': "The well-documented monitor backs into the incomplete bed. What if the flashy quarter ate the dress?"},
-         {'title': "Bye", 'text': "The well-documented monitor backs into the incomplete bed. What if the flashy quarter ate the dress?"}, {'title': "Bay", 'text': "The well-documented monitor backs into the incomplete bed. What if the flashy quarter ate the dress?"}, {'title': "Bow", 'text': "The well-documented monitor backs into the incomplete bed. What if the flashy quarter ate the dress?"}, {'title': "Last", 'text': "That's the last paragraph and it is verrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy lonnnggggggggggggg"}]
 
 
 @app.route('/searching', methods=['POST'])
@@ -24,12 +21,17 @@ def mainPage():
 @app.route('/results/<path:search_path>/', methods=['GET'])
 def searchResult(search_path):
     search_params = parse_qs(search_path)
-    print(search_params)
     first_letters = search_params['first_letters'][0]
     last_letters = search_params['last_letters'][0]
     txt_length = search_params['txt_length'][0]
+    window=txt_length.split('-')
+    window_l=int(window[0])
+    window_r=int(window[1])
     txt_url = search_params['txt_url'][0]
-    return render_template('results.html', first_letters=first_letters, last_letters=last_letters, txt_length=txt_length, txt_url=txt_url, title='Search Results', header="תוצאות חיפוש", lines=lines)
+
+    text = searchUtils.oneline_format(txt_url)
+    results = searchUtils.search(text,first_letters,last_letters,window_l,window_r)
+    return render_template('results.html', first_letters=first_letters, last_letters=last_letters, txt_length=txt_length, txt_url=txt_url, title='Search Results', header="תוצאות חיפוש", results=results)
 
 
 if __name__ == '__main__':

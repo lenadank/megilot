@@ -55,12 +55,11 @@
 {% block content %}
 <div class='container text-light text-right'>
     <div class="row">
-        {% for line in lines %}
+        {% for result in results %}
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">{{line.title}}</h5>
-                    <p class="card-text">{{line.text}}</p>
+                    <p class="card-text">{{result}}</p>
                     <a href="#">למקטע המלא</a>
                 </div>
             </div>
