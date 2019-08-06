@@ -53,16 +53,39 @@
 
 <!-- add all search results to page as cards -->
 {% block content %}
-<div class='container text-light text-right'>
-    <div class="row">
+<div class='container text-dark text-right'>
+    <div class="row d-flex flex-row-reverse">
         {% for result in results %}
+        {% set outer = loop %}
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <p class="card-text">{{result}}</p>
-                    <a href="#">למקטע המלא</a>
-                </div>
-            </div>
+            <div class="list-group filter-wrap">
+                <article class="list-group-item">
+                    <header class="filter-header">
+                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}" aria-expanded="true" class="">
+                            <i class="icon-action fa fa-chevron-down"></i>
+                            <h6 class="title">מקטע {{outer.index}}: {{result[0]|length}} אותיות</h6>
+                        </a>
+                    </header>
+                    <div class="filter-content collapse show" id="collapse{{outer.index}}" style="">
+                        <p> {{result[0]}} </p>
+                    </div> <!-- collapse -filter-content  .// -->
+                </article>
+                {% if result|length > 1 %}
+                {% for i in range(1,result|length) %}
+                <article class="list-group-item">
+                    <header class="filter-header">
+                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}-{{loop.index}}">
+                            <i class="icon-action fa fa-chevron-down"></i>
+                            <h6 class="title" dir="rtl">{{result[i]|length}} אותיות</h6>
+                        </a>
+                    </header>
+                    <div class="filter-content collapse" id="collapse{{outer.index}}-{{loop.index}}">
+                        <p>{{result[i]}} </p>
+                    </div>
+                </article>
+                {% endfor %}
+                {% endif %}
+            </div> 
         </div>
         {% endfor %}
     </div>

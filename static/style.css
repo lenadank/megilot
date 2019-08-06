@@ -11,8 +11,44 @@ body {
     color: rgb(241, 241, 241)
 }
 
-a{
-    color:#2e80b6
+a {
+    color: #2e80b6
+}
+
+header div.make-me-sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    padding: 0 15px;
+  }
+
+.card {
+    margin-bottom: 15px;
+}
+
+article.list-group-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: black
+}
+
+.icon-action {
+    margin-top: 5px;
+    float: left;
+    font-size: 80%;
+}
+
+.list-group-item .title {
+    margin-top: 5px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.list-group h6 {
+    color: #1c6bff
+}
+
+.list-group a {
+    color: #1c6bff
 }
 
 .container-fluid {
@@ -40,7 +76,7 @@ a{
     outline: none;
     position: relative;
     overflow: hidden;
-    border-radius: 10px;    
+    border-radius: 10px;
     -webkit-transform: translateZ(0);
     -webkit-transition: all 0.35s ease;
     transition: all 0.35s ease;

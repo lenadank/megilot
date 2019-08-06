@@ -37,10 +37,13 @@ def search(text, first, last, window_l, window_r):
     for f_index in first_indexes:
         x = min(f_index+window_l-len(last)-1, len(text)-len(last)-1) #min index to start searching for 'last'
         y = min(f_index+window_r-len(last), len(text)-len(last)) #max index to search for 'last'
+        cur_results = []
         for j in range(x,y):
             cur_text = text[j:j+len(last)]
             if cur_text.lower() == last.lower():
-                results.append(text[f_index:j+len(last)])
+                cur_results.append(text[f_index:j+len(last)])
+        if len(cur_results)>0:
+            results.append(cur_results)
                 #print("start at:"+str(f_index)+":")
                 #print(text[f_index:j+len(last)]+"\n")
     return results
