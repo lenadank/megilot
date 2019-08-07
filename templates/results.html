@@ -21,7 +21,7 @@
                             placeholder="למשל בגד" value={{last_letters}} required="">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4">
+                <div class="col-lg-2 col-md-2">
                     <div class="form-group text-right" dir="rtl">
                         <label for="number" class="text-right">מספר תווים:</label>
                         <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
@@ -32,7 +32,16 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-5 col-md-10">
+                <div class="col-lg-2 col-md-2">
+                    <div class="form-group text-right" dir="rtl">
+                        <label for="number" class="text-right">שפה:</label>
+                        <select class="form-control text-right" dir="rtl" name="language" id="language">
+                            <option>עברית</option>
+                            <option>אנגלית</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-10">
                     <div class="form-group text-right">
                         <label class="text-right" dir='rtl'>קישור לטקסט:</label>
                         <input class="form-control" type="text" name="text-url" id="text-url"
@@ -61,7 +70,8 @@
             <div class="list-group filter-wrap">
                 <article class="list-group-item">
                     <header class="filter-header">
-                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}" aria-expanded="true" class="">
+                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}" aria-expanded="true"
+                            class="">
                             <i class="icon-action fa fa-chevron-down"></i>
                             <h6 class="title">מקטע {{outer.index}}: {{result[0]|length}} אותיות</h6>
                         </a>
@@ -85,7 +95,7 @@
                 </article>
                 {% endfor %}
                 {% endif %}
-            </div> 
+            </div>
         </div>
         {% endfor %}
     </div>

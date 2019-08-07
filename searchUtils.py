@@ -1,5 +1,5 @@
-import urllib.request as uli
 import re
+import requests
 
 # for testing and debugging.
 # text_url is a url consisting of plain text
@@ -7,39 +7,65 @@ import re
 text_url = 'https://ia800908.us.archive.org/6/items/alicesadventures19033gut/19033-8.txt'
 html_url = 'http://mdn.github.io/beginner-html-site-styled/'
 
+
 # Takes txt in url and transforms the text to a one line string.
 # url must be a string
-def oneline_format(url):
+def format_txt(txt):
 
-    # Read row text from url in form of bytes.
-    txt = uli.urlopen(url).read()
-
-    # Decode bytes to string.
-    # TO-DO add try-except block for text encoded in different standards (utf-8 for example)
-    txt = txt.decode('iso-8859-1')
-
-    #Strip text from white spaces
-    #txt_list = txt.splitlines()
-    #txt = ''.join(txt_list)
-
-    #delete escape characters
-    #escapes = ''.join([chr(char) for char in range(1, 32)])
-    #escapes = {}
-    #txt = txt.translate(escapes)
+    #Remove hebrew panctuation from txt
+    nikud = ''.join([chr(char) for char in range(1425, 1480)])
+    nikud +=''.join([chr(char) for char in range(1520, 1525)])
+    translation = txt.maketrans(nikud,nikud,nikud)
+    txt = txt.translate(translation)
 
     return txt
 
+    # Takes '.txt' url.
+# Returns the formated '.txt' file as a string.
+def get_txt(url, language):
 
+    #Read raw text from url in form of bytes.
+    request = requests.get(url)
 
-def search(text, first, last, window_l, window_r):
+    #decode text according to language
+    if(language=='עברית'):
+        request.encoding = 'windows-1255'
+        txt = request.text
+    else:
+        request.encoding = 'UTF-8'
+        txt = request.text
+
+    return format_txt(txt)
+
+    # Takes url for a reposirary with texts and language of texts.
+# Returns list of strings. Each string represents one text from the url.
+#If '.txt' file is provided instead of a repositary, return list with one item.
+def texts_from_url(url, language):
+    texts = []
+    is_txt = re.search(r'\.txt',url)
+    if is_txt:
+        texts.append(get_txt(url,language))
+    else:
+        repositary = requests.get(url).text #returns HTML of repositary
+        pattern = re.compile(r'href=".+\.txt"')
+        txt_urls = pattern.finditer(repositary)
+        for txt_url in txt_urls:
+            href = txt_url.group() 
+            file_name = href[6:len(href)-1]
+            file_url = url+"/"+file_name
+            texts.append(get_txt(file_url,language))
+    return texts
+
+def search_txt(texts, first, last, window_l, window_r):
     results=[]
+    text=texts[0]
     first_indexes= [m.start() for m in re.finditer(first, text, re.I)] #list of all occurances of 'first' in text
     for f_index in first_indexes:
         x = min(f_index+window_l-len(last)-1, len(text)-len(last)-1) #min index to start searching for 'last'
         y = min(f_index+window_r-len(last), len(text)-len(last)) #max index to search for 'last'
         cur_results = []
         for j in range(x,y):
-            cur_text = text[j:j+len(last)]
+            cur_text = texts[0][j:j+len(last)]
             if cur_text.lower() == last.lower():
                 cur_results.append(text[f_index:j+len(last)])
         if len(cur_results)>0:
