@@ -1,103 +1,104 @@
 {% extends 'layout.html' %}
 
-<!-- replace description with a search bar to enable search from the results page -->
-{% block description %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12">
-            <form class="row form d-flex flex-row-reverse align-items-end" role='form' action="{{url_for('search')}}"
-                method="POST">
-                <div class="col-lg-2 col-md-4">
-                    <div class="form-group text-right" dir="rtl">
-                        <label for="text">אותיות ראשונות:</label>
-                        <input class="form-control" type="text" name="first-letters" id="first-letters"
-                            placeholder="למשל אבח" required="" value={{first_letters}}>
+{% block main_header %}
+<h2 class='display-4 pr-1 pl-3'>המגילות - תוצאות חיפוש</h2>
+<span class='navbar-text'>מציג {{results_num}} תוצאות</span>
+{% endblock main_header %}
+
+
+{% block content %}
+<div class="container-fluid my-container">
+    <div class='flex-row-reverse d-flex justify-content-center'>
+        <!--Search side-bar -->
+        <div class='col-2 px-0'>
+            <div class='d-flex flex-row sticky-top sticky-offset justify-content-center'>
+                <form class='border-left pr-3 pl-2 my-3' role="form" action="{{url_for('search')}}" method="POST">
+                    <div class="form-group text-right">
+                        <label dir="rtl" lang="he" class="text-center">תבנית
+                            חיפוש:</label>
+                        <textarea class="form-control text-right" name="letters" id="letters" dir="rtl" lang="he"
+                            type="text" rows='4' placeholder="יש להכניס כל סדרת אותיות חדשה בשורה חדשה"
+                            required="">{{letters}}</textarea>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <div class="form-group text-right" dir="rtl">
-                        <label for="text">אותיות אחרונות:</label>
-                        <input class="form-control" type="text" name="last-letters" id="last-letters"
-                            placeholder="למשל בגד" value={{last_letters}} required="">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-2">
-                    <div class="form-group text-right" dir="rtl">
-                        <label for="number" class="text-right">מספר תווים:</label>
-                        <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
+                    <div class="form-group text-right">
+                        <label for="example-number-input" dir="rtl" lang="he" class="text-center">מספר
+                            תווים במקטע:</label>
+                        <select class="form-control" dir="rtl" name="text-length" id="text-length">
                             <option>1-50</option>
                             <option>51-100</option>
                             <option>101-150</option>
                             <option>151-200</option>
                         </select>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-2">
-                    <div class="form-group text-right" dir="rtl">
-                        <label for="number" class="text-right">שפה:</label>
+                    <div class="form-group text-right">
+                        <label dir="rtl" lang="he" class="text-center">שפה:</label>
                         <select class="form-control text-right" dir="rtl" name="language" id="language">
                             <option>עברית</option>
                             <option>אנגלית</option>
                         </select>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-10">
                     <div class="form-group text-right">
-                        <label class="text-right" dir='rtl'>קישור לטקסט:</label>
-                        <input class="form-control" type="text" name="text-url" id="text-url"
-                            placeholder="https://www.google.com" required="" value={{txt_url}} type="url">
+                        <label for="example-url-input" dir="rtl" lang="he" class="text-center">קישור
+                            לטקסט:</label>
+                        <input class="form-control" name="text-url" id="text-url" type="url"
+                            placeholder="https://google.com" required="" value={{txt_url}}>
                     </div>
-                </div>
-                <div class="col-lg-1 col-md-2">
-                    <div class="form-group" dir="rtl">
-                        </br>
+                    <div class="form-group d-flex flex-row justify-content-center">
                         <button class="snip1431">חיפוש</button>
                     </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock description %}
-
-<!-- add all search results to page as cards -->
-{% block content %}
-<div class='container text-dark text-right'>
-    <div class="row d-flex flex-row-reverse">
-        {% for result in results %}
-        {% set outer = loop %}
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="list-group filter-wrap">
-                <article class="list-group-item">
-                    <header class="filter-header">
-                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}" aria-expanded="true"
-                            class="">
-                            <i class="icon-action fa fa-chevron-down"></i>
-                            <h6 class="title">מקטע {{outer.index}}: {{result[0]|length}} אותיות</h6>
-                        </a>
-                    </header>
-                    <div class="filter-content collapse show" id="collapse{{outer.index}}" style="">
-                        <p> {{result[0]}} </p>
-                    </div> <!-- collapse -filter-content  .// -->
-                </article>
-                {% if result|length > 1 %}
-                {% for i in range(1,result|length) %}
-                <article class="list-group-item">
-                    <header class="filter-header">
-                        <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}-{{loop.index}}">
-                            <i class="icon-action fa fa-chevron-down"></i>
-                            <h6 class="title" dir="rtl">{{result[i]|length}} אותיות</h6>
-                        </a>
-                    </header>
-                    <div class="filter-content collapse" id="collapse{{outer.index}}-{{loop.index}}">
-                        <p>{{result[i]}} </p>
-                    </div>
-                </article>
-                {% endfor %}
-                {% endif %}
+                </form>
             </div>
         </div>
-        {% endfor %}
+        <!--END OF search side-bar -->
+
+        <!--Search results grid-->
+        <div class='col-10 text-right' dir='rtl'>
+            <div class="container-fluid">
+                <div class="grid">
+                    <!--Sets initial size for Mansory JS-->
+                    <div class="grid-sizer col-lg-4 col-md-6 col-sm-12"></div>
+
+                    <!--Display all search results in 'results' list -->
+                    {% for result in results %}
+                    {% set outer = loop %}
+                    <div class="grid-item col-lg-4 col-md-6 col-sm-12">
+                        <div class="list-group filter-wrap">
+                            <article class="list-group-item">
+                                <header class="filter-header">
+                                    <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}"
+                                        aria-expanded="true" class="">
+                                        <i class="icon-action fa fa-chevron-down"></i>
+                                        <h6 class="title">מקטע {{outer.index}}: {{result[0]|length}} אותיות</h6>
+                                    </a>
+                                </header>
+                                <div class="filter-content collapse show" id="collapse{{outer.index}}">
+                                    <p> {{result[0]}} </p>
+                                </div> <!-- collapse -filter-content  .// -->
+                            </article>
+                            {% if result|length > 1 %}
+                            {% for i in range(1,result|length) %}
+                            <article class="list-group-item">
+                                <header class="filter-header">
+                                    <a href="#" data-toggle="collapse"
+                                        data-target="#collapse{{outer.index}}-{{loop.index}}">
+                                        <i class="icon-action fa fa-chevron-down"></i>
+                                        <h6 class="title" dir="rtl">{{result[i]|length}} אותיות</h6>
+                                    </a>
+                                </header>
+                                <div class="filter-content collapse" id="collapse{{outer.index}}-{{loop.index}}">
+                                    <p>{{result[i]}} </p>
+                                </div>
+                            </article>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!--END OF search results grid-->
+
     </div>
 </div>
 {% endblock content %}

@@ -1,5 +1,22 @@
+.grid-item {
+    margin-bottom: 2px;
+    padding: 3px;
+}
+
+.container-fluid {
+    margin: 5px 0px 0px 0px;
+}
+
 header {
     color: rgb(241, 241, 241)
+}
+
+.navbar a {
+    direction: rtl
+}
+
+.navbar {
+    background-color: black;
 }
 
 body {
@@ -8,16 +25,32 @@ body {
     -moz-background-size: cover;
     background-size: cover;
     -o-background-size: cover;
-    color: rgb(241, 241, 241)
+    color: rgb(241, 241, 241);
+}
+
+textarea{
+    padding: 0px;
+    margin: 0px;
+}
+
+.sticky-offset {
+    top: 79.4px;
+}
+
+.container {
+    position: relative;
+    top: 60px;
+}
+
+body .my-container {
+    position: relative;
+    top: 79.4px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 a {
     color: #2e80b6
-}
-
-
-.card {
-    margin-bottom: 15px;
 }
 
 article.list-group-item {
@@ -45,14 +78,8 @@ article.list-group-item {
     color: #1c6bff
 }
 
-.container-fluid {
-    padding-top: 10px;
-    padding-bottom: 20px;
-}
-
-.container .row .card {
-    background-color: rgba(255, 255, 255, 0.8);
-    color: black;
+header .display-4 {
+    font-size: 25px;
 }
 
 .snip1431 {

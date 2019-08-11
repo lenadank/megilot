@@ -31,13 +31,14 @@ def get_txt(url, language):
     if(language=='עברית'):
         request.encoding = 'windows-1255'
         txt = request.text
+        txt = format_txt(txt)
     else:
         request.encoding = 'UTF-8'
         txt = request.text
 
-    return format_txt(txt)
+    return txt
 
-    # Takes url for a reposirary with texts and language of texts.
+# Takes url for a reposirary with texts and language of texts.
 # Returns list of strings. Each string represents one text from the url.
 #If '.txt' file is provided instead of a repositary, return list with one item.
 def texts_from_url(url, language):
@@ -56,8 +57,11 @@ def texts_from_url(url, language):
             texts.append(get_txt(file_url,language))
     return texts
 
-def search_txt(texts, first, last, window_l, window_r):
+def search_txt(texts, letters_list, window_l, window_r):
     results=[]
+    print(letters_list)
+    first=letters_list[0]
+    last=letters_list[1]
     text=texts[0]
     first_indexes= [m.start() for m in re.finditer(first, text, re.I)] #list of all occurances of 'first' in text
     for f_index in first_indexes:
