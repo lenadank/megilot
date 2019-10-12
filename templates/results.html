@@ -50,7 +50,11 @@
             </div>
         </div>
         <!--END OF search side-bar -->
-
+        {% if results is none %}
+        <div class='col-10 text-center' dir='rtl'>
+            <h1>לא נמצאו תוצאות</h1>
+        </div>
+        {% else %}
         <!--Search results grid-->
         <div class='col-10 text-right' dir='rtl'>
             <div class="container-fluid">
@@ -59,7 +63,7 @@
                     <div class="grid-sizer col-lg-4 col-md-6 col-sm-12"></div>
 
                     <!--Display all search results in 'results' list -->
-                    {% for result in results %}
+                    {% for group in results %}
                     {% set outer = loop %}
                     <div class="grid-item col-lg-4 col-md-6 col-sm-12">
                         <div class="list-group filter-wrap">
@@ -68,25 +72,42 @@
                                     <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}"
                                         aria-expanded="true" class="">
                                         <i class="icon-action fa fa-chevron-down"></i>
-                                        <h6 class="title">מקטע {{outer.index}}: {{result[0]|length}} אותיות</h6>
+                                        <h6 class="title">מקטע {{outer.index}}: {{group[0]|length}} אותיות</h6>
                                     </a>
                                 </header>
                                 <div class="filter-content collapse show" id="collapse{{outer.index}}">
-                                    {{test}}
+                                    <p>
+                                        {% for i in range(0,group[0]|length) %}
+                                        {% if i is divisibleby 2 %}
+                                        {{group[0][i]}}
+                                        {% else %}
+                                        <strong>{{group[0][i]}}</strong>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </p>
                                 </div> <!-- collapse -filter-content  .// -->
                             </article>
-                            {% if result|length > 1 %}
-                            {% for i in range(1,result|length) %}
+                            {% if group|length > 1 %}
+                            {% for i in range(1,group|length) %}
+                            {% set result_loop = loop %}
                             <article class="list-group-item">
                                 <header class="filter-header">
                                     <a href="#" data-toggle="collapse"
                                         data-target="#collapse{{outer.index}}-{{loop.index}}">
                                         <i class="icon-action fa fa-chevron-down"></i>
-                                        <h6 class="title" dir="rtl">{{result[i]|length}} אותיות</h6>
+                                        <h6 class="title" dir="rtl">num אותיות</h6>
                                     </a>
                                 </header>
                                 <div class="filter-content collapse" id="collapse{{outer.index}}-{{loop.index}}">
-                                    <p>{{result[i]}} </p>
+                                    <p>
+                                        {% for j in range(0,group[result_loop.index]|length) %}
+                                        {% if j is divisibleby 2 %}
+                                        {{group[result_loop.index][j]}}
+                                        {% else %}
+                                        <strong>{{group[result_loop.index][j]}}</strong>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </p>
                                 </div>
                             </article>
                             {% endfor %}
@@ -97,6 +118,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
         <!--END OF search results grid-->
 
     </div>

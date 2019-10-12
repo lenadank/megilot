@@ -33,7 +33,6 @@ def get_txt(url, language):
     if(language=='עברית'):
         request.encoding = 'windows-1255'
         txt = request.text
-        txt = format_txt(txt)
     else:
         request.encoding = 'UTF-8'
         txt = request.text
@@ -56,18 +55,9 @@ def texts_from_url(url, language):
             href = txt_url.group() 
             file_name = href[6:len(href)-1]
             file_url = url+"/"+file_name
-            texts.append(get_txt(file_url,language)[0])
+            texts.append(get_txt(file_url,language))
     return texts
 
-#currently supports search in one text only
-def search_txt(texts, letters_list, window_l, window_r):
-    text = texts[0]
-    no_nikud = format_txt(text)
-    spans_for_search = all_strings_spans(no_nikud, letters_list, False)
-    spans_nikud = all_strings_spans(text,letters_list, True)
-    result = search_rec_raw(window_l, window_r, spans_for_search[0], spans_for_search, 0)
-    final = get_final_results(result,spans_nikud,text)
-    return final
 
 def create_pattern(text):
     pattern = ''
@@ -161,24 +151,6 @@ def expand_passage_right(end_span, text):
             spaces += 1
         i += 1
     return i-1
-
-
-def group_by_first_string_raw(spans_indices_results):
-    cur_start = spans_indices_results[0][0]
-    i=0
-    res = []
-    cur_parag=[]
-    while i<len(spans_indices_results):
-        next_result = spans_indices_results[i]
-        next_start = next_result[0]
-        if cur_start != next_start:
-            res.append(cur_parag)
-            cur_parag = []
-            cur_start = next_start
-        cur_parag.append(next_result)
-        i+=1
-    res.append(cur_parag)
-    return res
         
 def indices_to_text(indices, all_string_spans_list, text):
     res = []
@@ -203,15 +175,46 @@ def indices_to_text(indices, all_string_spans_list, text):
 
     return res
 
+def group_by_first_string_raw(spans_indices_results):
+    cur_start = spans_indices_results[0][0]
+    i=0
+    res = []
+    cur_parag=[]
+    while i<len(spans_indices_results):
+        next_result = spans_indices_results[i]
+        next_start = next_result[0]
+        if cur_start != next_start:
+            res.append(cur_parag)
+            cur_parag = []
+            cur_start = next_start
+        cur_parag.append(next_result)
+        i+=1
+    res.append(cur_parag)
+    return res
+
 
 def get_final_results(result, all_string_spans_list, text):
+    num_res = len(result)
     grouped_spans = group_by_first_string_raw(result)
     final_res=[]
     for group in grouped_spans:
         paragraphs_group=[]
         for indices in group:
             cur_parag = indices_to_text(indices,all_string_spans_list,text)
-            print(cur_parag)
             paragraphs_group.append(cur_parag)
         final_res.append(paragraphs_group)
-    return final_res
+    return (final_res, num_res)
+
+    #currently supports search in one text only
+def search_txt(texts, letters_list, window_l, window_r):
+    text = texts[0]
+    no_nikud = format_txt(text)
+    spans_for_search = all_strings_spans(no_nikud, letters_list, False)
+    spans_nikud = all_strings_spans(text,letters_list, True)
+    result = search_rec_raw(window_l, window_r, spans_for_search[0], spans_for_search, 0)
+    if result:
+        final, num_res = get_final_results(result,spans_nikud,text)
+    else:
+        final = None
+        num_res = 0
+    return (final, num_res)

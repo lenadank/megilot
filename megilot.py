@@ -7,6 +7,7 @@ from flask import Markup
 
 
 
+
 @app.route('/searching', methods=['POST'])
 def search():
         if request.method == 'POST':
@@ -39,11 +40,8 @@ def searchResult(search_path):
         txt_url = search_params['txt_url'][0]
         #return list of all txt files in the url
         texts = texts_from_url(txt_url, language)
-        results = search_txt(texts,letters_list, window_l, window_r)
-        total_results_num = reduce(lambda count, l: count + len(l), results,0)
-
-        test = Markup('<p> is it ok now? <b>This is bold! </b></p>')
-        return render_template('results.html', letters=letters, txt_length=txt_length, txt_url=txt_url, title='Search Results', header="תוצאות חיפוש", results=results , is_main=False, results_num = total_results_num, test=test)
+        results, total_results_num = search_txt(texts,letters_list, window_l, window_r)
+        return render_template('results.html', letters=letters, txt_length=txt_length, txt_url=txt_url, title='Search Results', header="תוצאות חיפוש", results=results , is_main=False, results_num = total_results_num)
 
 
 if __name__ == '__main__':
