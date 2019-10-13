@@ -1,12 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from urllib.parse import urlencode, parse_qs
-from searchUtils import *
+from searchUtils import texts_from_url, search_txt
 from functools import reduce
 app = Flask(__name__)
-from flask import Markup
-
-
-
 
 @app.route('/searching', methods=['POST'])
 def search():
