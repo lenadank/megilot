@@ -2,6 +2,7 @@ import re
 import requests
 import collections
 
+
 def remove_nikud(txt):
     """Remove nikud from Hebrew text.
 
@@ -18,6 +19,7 @@ def remove_nikud(txt):
     txt = txt.translate(translation)
 
     return txt
+
 
 def decode_txt(url, language='עברית'):
     """Get text from .txt url, decode it and returng it's string representation. 
@@ -41,6 +43,7 @@ def decode_txt(url, language='עברית'):
         txt = request.text
 
     return txt
+
 
 def texts_from_url(url, language):
     """Get a str list of texts from url representing a repositary with .txt files or a single .txt file.
@@ -68,6 +71,7 @@ def texts_from_url(url, language):
             texts.append(decode_txt(file_url, language))
     return texts
 
+
 def create_pattern(text):
     '''Create a regex pattern to search strings inside Hebrew text with nikud. Return a string.'''
     pattern = ''
@@ -75,14 +79,15 @@ def create_pattern(text):
         pattern = pattern+letter+r'[\u0591-\u05c7]*'
     return pattern
 
+
 def single_string_spans(text, string, nikud=False):
     """Get enumperated spans of apearances of a single string in text. 
-    
+
     Args:
         text (str): text to search string in.
         string (str): string to search in text.
         nikud (bool, optional): Indicates if text is a Hebrew str with nikud. Defaults to False.
-    
+
     Returns:
         list: enumerated spans.
     """
@@ -96,14 +101,15 @@ def single_string_spans(text, string, nikud=False):
 
     return res
 
+
 def all_strings_spans(text, strings_list, nikud=False):
     """Get list of lists contating spans of apearances in text for all strings in strings_list.
-    
+
     Args:
         text (str): text to search string in.
         strings_list (list): list of strings to search in text.
         nikud (bool, optional): Indicates if text is a Hebrew str with nikud. Defaults to False.
-    
+
     Returns:
         list: list of lists, each contains enumperated spans of apearances of a single string in text.
             or None if one of the strings wasn't found. (one of the lists is empty).
@@ -113,21 +119,22 @@ def all_strings_spans(text, strings_list, nikud=False):
         cur = single_string_spans(text, string, nikud)
         if cur:
             result.append(cur)
-        else: #one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
+        else:  # one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
             return None
     return result
+
 
 def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
     """Recursively get indexes of spans inside all_string_spans representing a result in which the i'th string found is at least
         window_l and at most window_r far from the i+1 string in text. ONLY WORKS WHEN at least two strings were specified by user to search.  
-    
+
     Args:
         window_l (int): minimum distance between each string
         window_r (int): maximum distance between each string
         cur_string_spans (list): Note - initiate with all_string_spans[0]. list of spans representing occurances of a single string in the text.
         all_strings_spans (list): list of all lists of spans. Each list representing occurances of a single string.
         i (int): Note - initiate with 0. Represents current string spans list to search matches in. 
-    
+
     Returns:
         list: list of deques. Each deque represents a result. 
             Each deque contains indexes of spans in all_string_spans. 
@@ -145,7 +152,7 @@ def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
         cur_span_index = span[0]
         if i < len(all_strings_spans)-1:
             # list all possible candidates ( spans within the specified window) of being a match.
-            # Candidates are searched inside the next spans list (representing apearances of the 
+            # Candidates are searched inside the next spans list (representing apearances of the
             # next string the user has specified)
             candidates = list(
                 (index, cand_span) for index, cand_span in all_strings_spans[i+1] if cand_span[1] > cur_span[0]+window_l and cand_span[1] < cur_span[0]+window_r)
@@ -171,50 +178,78 @@ def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
 
     return all_results
 
-def expand_passage_left(start_span, text):
+
+def single_string_search(all_strings_spans, text):
+    result = []
+    enums = all_strings_spans[0]
+    for enum in enums:
+        span = enum[1]
+        cur_res = []
+        group_wrapper = []
+
+        # left expantion
+        left_index = expand_passage_left(span, text, 12)
+        cur_res.append(text[left_index:span[0]])
+
+        # string
+        cur_res.append(text[span[0]:span[1]])
+
+        # right expantion
+        right_index = expand_passage_right(span, text, 12)
+        cur_res.append(text[span[1]:right_index])
+
+        group_wrapper.append(cur_res)
+        result.append(group_wrapper)
+
+    return (result, len(result))
+
+
+def expand_passage_left(start_span, text, num_spaces=6):
     """Calculate index of start of the expended passege to the left. 
-    
+
     Args:
         start_span (tuple): span representing first string searched.
         text (str): text searched in. 
-    
+
     Returns:
         int: index of expended passege to the left. 
     """
     spaces = 0
     i = start_span[0]
-    while spaces < 6 and i > 0:
+    while spaces < num_spaces and i > 0:
         if text[i] == ' ':
             spaces += 1
         i -= 1
     return i+1
 
-def expand_passage_right(end_span, text):
+
+def expand_passage_right(end_span, text, num_spaces=6):
     """Calculate index of start of the expended passege to the right. 
-    
+
     Args:
         start_span (tuple): span representing last string searched.
         text (str): text searched in. 
-    
+
     Returns:
         int: index of expended passege to the right. 
     """
     spaces = 0
     i = end_span[1]
-    while spaces < 6 and i < len(text):
+    while spaces < num_spaces and i < len(text):
         if text[i] == ' ':
             spaces += 1
         i += 1
     return i-1
 
+
 def indices_to_text(indices, all_string_spans_list, text):
     """Convert a single deque of indices of spans representing a result to a list of strings representing the result. 
-    
+
     Args:
         indices (deque): a single tuple representing a result. 
         all_string_spans_list (list): list of lists with spans representing the occurences of  the strings specified by the user. 
         text (str): text searched in. 
-    
+
     Returns:
         list: list of strings representing a result = a single passege from the text
     """
@@ -240,6 +275,7 @@ def indices_to_text(indices, all_string_spans_list, text):
 
     return res
 
+
 def group_by_first_string_raw(spans_indices_results):
     '''Group result from search_rec_raw according to first string. All results starting with the same index are grouped in a list.
     Return a list of lists with deques. 
@@ -261,14 +297,15 @@ def group_by_first_string_raw(spans_indices_results):
     res.append(cur_parag)
     return res
 
+
 def get_final_results(result, all_string_spans_list, text):
     """Convert all raw results to lists of strings representing a passage in the text grouped by first string.
-    
+
     Args:
         result (list): raw result retrieved from search_rec_raw() method. 
         all_string_spans_list (list): list of lists with spans representing the occurences of  the strings specified by the user. 
         text (str): text searched in. 
-    
+
     Returns:
         tuple: (list, int) - list of lists representing grouped results. Each group contains lists of strings repesenting a single result.
                 the int represents total number of results.  
@@ -284,35 +321,41 @@ def get_final_results(result, all_string_spans_list, text):
         final_res.append(paragraphs_group)
     return (final_res, num_res)
 
+
 def search_txt(texts, strings_list, window_l, window_r):
     """Find passeges in text containing each string from strings_list in an ordered way and with a space of
     minimum window_l charcters and maximum window_r charcters inbetween each string. Return each passage represented as 
     a list of strings, which when combined together form the passege. Currently supports search in Hebrew text only.
-    
+
     Args:
         texts (str): text to search in.
         strings_list (list): strings to search in text.
         window_l (int): minimum  distance between each string.
         window_r (int): maximum distance between each string. 
-    
+
     Returns:
         (list, int): list of lists representing grouped passages. Each group contains lists of strings which when combined
         together form a single passege - a result.
     """
 
-    text = texts[0] #currently supports search in one text only
+    text = texts[0]  # currently supports search in one text only
     no_nikud_txt = remove_nikud(text)
     spans_for_search = all_strings_spans(no_nikud_txt, strings_list)
     spans_nikud = all_strings_spans(text, strings_list, True)
-    if spans_for_search: #spans_for_search isn't None -> all strings are found in text and the algorithem can continue. 
+    # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
+    if spans_nikud == None:
+        return(None, 0)
+
+    if len(strings_list) == 1:
+        final, num_res = single_string_search(spans_nikud, text)
+        if not final: #final is an empty list -> no results found.
+            return (None, 0)
+    else:
         result = search_rec_raw(
             window_l, window_r, spans_for_search[0], spans_for_search, 0)
-        if result: #result isn't an empty list -> some results were found. 
+        if result:  # result isn't an empty list -> some results were found.
             final, num_res = get_final_results(result, spans_nikud, text)
-        else: #result is an empty list -> no results for the search. 
-            final = None
-            num_res = 0
-    else: #spans_for_search returned None -> indicates one of the strings wasn't found, thus no results can be found. 
-        final = None
-        num_res = 0
+        else:  # result is an empty list -> no results for the search.
+            return (None, 0)
+
     return (final, num_res)

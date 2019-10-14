@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for
 from urllib.parse import urlencode, parse_qs
-from searchUtils import texts_from_url, search_txt
+from megilot import searchUtils as su
 from functools import reduce
-app = Flask(__name__)
+from megilot import app
 
 @app.route('/searching', methods=['POST'])
 def search():
@@ -35,10 +35,6 @@ def searchResult(search_path):
         #extract url from user input
         txt_url = search_params['txt_url'][0]
         #return list of all txt files in the url
-        texts = texts_from_url(txt_url, language)
-        results, total_results_num = search_txt(texts,letters_list, window_l, window_r)
+        texts = su.texts_from_url(txt_url, language)
+        results, total_results_num = su.search_txt(texts,letters_list, window_l, window_r)
         return render_template('results.html', letters=letters, txt_length=txt_length, txt_url=txt_url, title='Search Results', header="תוצאות חיפוש", results=results , is_main=False, results_num = total_results_num)
-
-
-if __name__ == '__main__':
-        app.run(debug=True)
