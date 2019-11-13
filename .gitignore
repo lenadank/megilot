@@ -2,9 +2,14 @@
 __pycache__/
 *.py[cod]
 *$py.class
+env/
+megilot/static/texts/
 
 # C extensions
 *.so
+
+config.py
+.vscode/settings.json
 
 # Distribution / packaging
 .Python

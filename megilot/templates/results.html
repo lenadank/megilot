@@ -2,17 +2,38 @@
 
 {% block main_header %}
 <h2 class='display-4 pr-1 pl-3'>המגילות - תוצאות חיפוש</h2>
-<span class='navbar-text'>מציג {{results_num}} תוצאות</span>
+{% if result is not none %}
+<span class='navbar-text' dir='rtl'>מציג {{result[1]}} תוצאות ב:</span>
+<div class="dropdown">
+    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{cur_page}}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right scrollable-menu" aria-labelledby="dropdownMenuButton">
+        {% for name in filenames %}
+        {% if cur_page == page_name %}
+        <li><a class="dropdown-item active" href="{{ url_for('searchResult', page=name) }}">{{name}}</a></li>
+        {% else %}
+        <li><a class="dropdown-item" href="{{ url_for('searchResult', page=name) }}">{{name}}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 {% endblock main_header %}
 
 
 {% block content %}
-<div class="container-fluid my-container">
-    <div class='flex-row-reverse d-flex justify-content-center'>
+<div class="container-fluid my-container mb-3">
+    <div class='flex-row-reverse d-flex justify-content-arround'>
         <!--Search side-bar -->
-        <div class='col-2 px-0'>
-            <div class='d-flex flex-row sticky-top sticky-offset justify-content-center'>
+        <div class='col-2 px-0' id='side-bar'>
+            <div class='d-flex flex-row sticky-top sticky-offset justify-content-around'>
                 <form class='border-left pr-3 pl-2 my-3' role="form" action="{{url_for('search')}}" method="POST">
+                    <div class="form-group" dir='rtl'>
+                        <div class="font-weight-bold text-center">חיפוש בטקסטים
+                            הנוכחיים:</div>
+                    </div>
                     <div class="form-group text-right">
                         <label dir="rtl" lang="he" class="text-center">תבנית
                             חיפוש:</label>
@@ -30,40 +51,31 @@
                             <option>151-200</option>
                         </select>
                     </div>
-                    <div class="form-group text-right">
-                        <label dir="rtl" lang="he" class="text-center">שפה:</label>
-                        <select class="form-control text-right" dir="rtl" name="language" id="language">
-                            <option>עברית</option>
-                            <option>אנגלית</option>
-                        </select>
-                    </div>
-                    <div class="form-group text-right">
-                        <label for="example-url-input" dir="rtl" lang="he" class="text-center">קישור
-                            לטקסט:</label>
-                        <input class="form-control" name="text-url" id="text-url" type="url"
-                            placeholder="https://google.com" required="" value={{txt_url}}>
-                    </div>
                     <div class="form-group d-flex flex-row justify-content-center">
                         <button class="snip1431">חיפוש</button>
+                    </div>
+                    <div class="form-group d-flex flex-row justify-content-center">
+                        <a class='small text-center text-light' href="{{url_for('mainPage')}}"
+                            style="color:#ff951c">בחירת טקסטים חדשים לחיפוש</a>
                     </div>
                 </form>
             </div>
         </div>
         <!--END OF search side-bar -->
-        {% if results is none %}
+        {% if result is none %}
         <div class='col-10 text-center' dir='rtl'>
             <h1>לא נמצאו תוצאות</h1>
         </div>
         {% else %}
         <!--Search results grid-->
         <div class='col-10 text-right' dir='rtl'>
-            <div class="container-fluid">
+            <div class="container-fluid" id="results-override">
                 <div class="grid">
                     <!--Sets initial size for Mansory JS-->
                     <div class="grid-sizer col-lg-4 col-md-6 col-sm-12"></div>
 
                     <!--Display all search results in 'results' list -->
-                    {% for group in results %}
+                    {% for group in result[0] %}
                     {% set outer = loop %}
                     <div class="grid-item col-lg-4 col-md-6 col-sm-12">
                         <div class="list-group filter-wrap">
@@ -72,41 +84,42 @@
                                     <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}"
                                         aria-expanded="true" class="">
                                         <i class="icon-action fa fa-chevron-down"></i>
-                                        <h6 class="title">מקטע {{outer.index}}: {{group[0]|length}} אותיות</h6>
+                                        <h6 class="title" dir='rtl'>מקטע {{outer.index}} - תוצאה 1</h6>
                                     </a>
                                 </header>
                                 <div class="filter-content collapse show" id="collapse{{outer.index}}">
                                     <p>
-                                        {% for i in range(0,group[0]|length) %}
-                                        {% if i is divisibleby 2 %}
-                                        {{group[0][i]}}
-                                        {% else %}
-                                        <strong>{{group[0][i]}}</strong>
-                                        {% endif %}
-                                        {% endfor %}
+                                        {% for i in range(0,group[0]|length) -%}
+                                        {% if i is divisibleby 2 -%}
+                                        <span>{{group[0][i]}}</span>
+                                        {%- else -%}
+                                        <span class="font-weight-bold">{{group[0][i]}}</span>
+                                        {%- endif %}
+                                        {%- endfor %}
                                     </p>
                                 </div> <!-- collapse -filter-content  .// -->
                             </article>
                             {% if group|length > 1 %}
-                            {% for i in range(1,group|length) %}
+                            {% for i in range(1,group|length) -%}
                             {% set result_loop = loop %}
                             <article class="list-group-item">
                                 <header class="filter-header">
                                     <a href="#" data-toggle="collapse"
-                                        data-target="#collapse{{outer.index}}-{{loop.index}}">
+                                        data-target="#collapse{{outer.index}}-{{loop.index}}" aria-expanded="true"
+                                        class=''>
                                         <i class="icon-action fa fa-chevron-down"></i>
-                                        <h6 class="title" dir="rtl">num אותיות</h6>
+                                        <h6 class="title" dir="rtl">תוצאה {{i+1}}</h6>
                                     </a>
                                 </header>
-                                <div class="filter-content collapse" id="collapse{{outer.index}}-{{loop.index}}">
+                                <div class="filter-content collapse show" id="collapse{{outer.index}}-{{loop.index}}">
                                     <p>
-                                        {% for j in range(0,group[result_loop.index]|length) %}
-                                        {% if j is divisibleby 2 %}
-                                        {{group[result_loop.index][j]}}
-                                        {% else %}
-                                        <strong>{{group[result_loop.index][j]}}</strong>
-                                        {% endif %}
-                                        {% endfor %}
+                                        {% for j in range(0,group[result_loop.index]|length) -%}
+                                        {% if j is divisibleby 2 -%}
+                                        <span>{{group[result_loop.index][j]}}</span>
+                                        {%- else -%}
+                                        <span class="font-weight-bold">{{group[result_loop.index][j]}}</span>
+                                        {%- endif %}
+                                        {%- endfor %}
                                     </p>
                                 </div>
                             </article>

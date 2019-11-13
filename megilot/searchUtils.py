@@ -1,6 +1,23 @@
 import re
 import requests
 import collections
+from megilot import app
+
+
+def strip_strings(strings):
+    """Remove leading and tailing whitespace from each of the strings in the list.
+
+    Args:
+        strings (list): list of strings.
+
+    Returns:
+        list: of string without leading and tailing whitespace.
+
+    """
+    res = []
+    for s in strings:
+        res.append(s.strip())
+    return res
 
 
 def remove_nikud(txt):
@@ -21,62 +38,24 @@ def remove_nikud(txt):
     return txt
 
 
-def decode_txt(url, language='עברית'):
-    """Get text from .txt url, decode it and returng it's string representation. 
-
-    Args:
-        url (str): A string representing of the url containing the .txt file.
-        language (str): language of text in the .txt file. Deafult - "עברית".
-
-    Returns:
-        str: the text as a string
-    """
-    # Read raw text from url in form of bytes.
-    request = requests.get(url)
-
-    # decode text according to language
-    if(language == 'עברית'):
-        request.encoding = 'windows-1255'
-        txt = request.text
-    else:
-        request.encoding = 'UTF-8'
-        txt = request.text
-
-    return txt
-
-
-def texts_from_url(url, language):
-    """Get a str list of texts from url representing a repositary with .txt files or a single .txt file.
-
-    Args:
-        url (str): string representation of url with a repositary containing .txt files
-                   or a single .txt file url.
-        language (str): language of texts in repositary/.txt file.
-
-    Returns:
-        list: str list of texts obtained from the url. 
-    """
-    texts = []
-    is_txt = re.search(r'\.txt', url)
-    if is_txt:
-        texts.append(decode_txt(url, language))
-    else:
-        repositary = requests.get(url).text  # get HTML of repositary
-        pattern = re.compile(r'href=".+\.txt"')
-        txt_urls = pattern.finditer(repositary)
-        for txt_url in txt_urls:
-            href = txt_url.group()
-            file_name = href[6:len(href)-1]
-            file_url = url+"/"+file_name
-            texts.append(decode_txt(file_url, language))
-    return texts
-
-
-def create_pattern(text):
+def create_pattern(string):
     '''Create a regex pattern to search strings inside Hebrew text with nikud. Return a string.'''
+    
+    #create a list of the string splitted by letters or [] with a string inside
+    #for exapmle if string is 'he[ll]o', strings=['h','e','[ll],'o'] 
+    strings=[]
+    p = re.compile('(\[[א-ת]+\])')
+    temp_strings = p.split(string)
+    for s in temp_strings:
+	    if '[' in s:
+		    strings.append(s)
+	    else:
+		    strings.extend(list(s))
+
+    #create a pattern from strings. Have zero or more nikud chars after each element (letter or [] with a string inside)
     pattern = ''
-    for letter in text:
-        pattern = pattern+letter+r'[\u0591-\u05c7]*'
+    for string in strings:
+        pattern = pattern+string+r'[\u0591-\u05c7]*'
     return pattern
 
 
@@ -180,7 +159,18 @@ def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
 
 
 def single_string_search(all_strings_spans, text):
+    """Calculate index of start of the expended passege to the left. 
+
+    Args:
+        all_strings_spans (list): list of enumerated spans of all accurances of the single string to search in text.
+        text (str): text searched in. 
+
+    Returns:
+        tuple (list, int): list of groups - each group representing a passage starting with the same word.
+                            Each group contains list of string that when joined result in one sentence with the searched string in. 
+    """
     result = []
+    # only one string to search - meaning only one list in all_string_spans
     enums = all_strings_spans[0]
     for enum in enums:
         span = enum[1]
@@ -272,7 +262,7 @@ def indices_to_text(indices, all_string_spans_list, text):
     end_span = all_string_spans_list[-1][indices[-1]][1]
     right_index = expand_passage_right(end_span, text)
     res.append(text[end_span[1]:right_index])
-
+    print(''.join(res))
     return res
 
 
@@ -337,25 +327,30 @@ def search_txt(texts, strings_list, window_l, window_r):
         (list, int): list of lists representing grouped passages. Each group contains lists of strings which when combined
         together form a single passege - a result.
     """
+    all_pages = {}
+    for text_name, text in texts.items():
+        no_nikud_txt = remove_nikud(text)
+        spans_for_search = all_strings_spans(no_nikud_txt, strings_list)
+        spans_nikud = all_strings_spans(text, strings_list, True)
+        # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
+        if spans_nikud == None or spans_for_search == None:
+            continue
 
-    text = texts[0]  # currently supports search in one text only
-    no_nikud_txt = remove_nikud(text)
-    spans_for_search = all_strings_spans(no_nikud_txt, strings_list)
-    spans_nikud = all_strings_spans(text, strings_list, True)
-    # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
-    if spans_nikud == None:
-        return(None, 0)
+        if len(strings_list) == 1:
+            final, num_res = single_string_search(spans_nikud, text)
+        else:
+            result = search_rec_raw(
+                window_l, window_r, spans_for_search[0], spans_for_search, 0)
+            # result isn't an empty list -> some results were found.
+            if result:
+                final, num_res = get_final_results(result, spans_nikud, text)
+            else:  # result is an empty list -> no results for the search.
+                continue
 
-    if len(strings_list) == 1:
-        final, num_res = single_string_search(spans_nikud, text)
-        if not final: #final is an empty list -> no results found.
-            return (None, 0)
+        all_pages[text_name] = (final, num_res)
+
+    if all_pages:
+        return all_pages
     else:
-        result = search_rec_raw(
-            window_l, window_r, spans_for_search[0], spans_for_search, 0)
-        if result:  # result isn't an empty list -> some results were found.
-            final, num_res = get_final_results(result, spans_nikud, text)
-        else:  # result is an empty list -> no results for the search.
-            return (None, 0)
-
-    return (final, num_res)
+        print('no results at all')
+        return None

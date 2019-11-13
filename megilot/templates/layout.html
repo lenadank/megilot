@@ -20,36 +20,36 @@
     {% endif %}
 
 </head>
-<header>
+<header id='header-override'>
     {% if is_main %}
     <nav class="navbar main-nav navbar-expand-md navbar-dark d-flex fixed-top py-3">
-    {% else %}
-    <nav class="navbar main-nav navbar-expand-md navbar-dark d-flex fixed-top py-3 border-bottom">
-    {% endif %}
-        <div class="navbar-collapse collapse w-100">
-            <ul class="navbar-nav mr-auto flex-row-reverse">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{{ url_for('mainPage') }}">ראשי</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">כיצד משתמשים?</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">אודות</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">יצירת קשר</a>
-                </li>
-            </ul>
-        </div>
-        <div class="navbar-collapse collapse dual-collapse2 w-100 flex-row-reverse">
-            {% block main_header %}
-            {% endblock main_header %}
-        </div>
-    </nav>
+        {% else %}
+        <nav class="navbar main-nav navbar-expand-md navbar-dark d-flex fixed-top py-3 border-bottom">
+            {% endif %}
+            <div class="navbar-collapse collapse w-100">
+                <ul class="navbar-nav mr-auto flex-row-reverse">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ url_for('mainPage') }}">ראשי</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">כיצד משתמשים?</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">אודות</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">יצירת קשר</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="navbar-collapse collapse dual-collapse2 w-100 flex-row-reverse">
+                {% block main_header %}
+                {% endblock main_header %}
+            </div>
+        </nav>
 </header>
 
-<body>
+<body id='override'>
     {% block content %}
     {% endblock %}
     <!-- Optional JavaScript -->
@@ -82,6 +82,8 @@
         });
 
     </script>
+    {% block scripts %}
+    {% endblock %}
 </body>
 
 </html>

@@ -11,6 +11,10 @@ header {
     color: rgb(241, 241, 241)
 }
 
+#override .small{
+    margin-bottom: 2px;
+}
+
 .navbar a {
     direction: rtl
 }
@@ -18,6 +22,7 @@ header {
 .navbar {
     background-color: black;
 }
+
 
 body {
     background: url('background.jpg') no-repeat center center fixed;
@@ -27,6 +32,7 @@ body {
     -o-background-size: cover;
     color: rgb(241, 241, 241);
 }
+
 
 textarea{
     padding: 0px;
@@ -51,6 +57,26 @@ body .my-container {
 
 a {
     color: #2e80b6
+}
+
+#header-override .scrollable-menu{
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+    position: absolute;
+    z-index: 1100;
+}
+
+#header-override .dropdown{
+    position: absolute;
+    right: 430px;
+    z-index: 1100;
+}
+
+#header-override .dropdown .btn{
+    background-color: #ff951c;
+    color: black;
+    border-radius: 10px;
 }
 
 article.list-group-item {
@@ -141,3 +167,4 @@ header .display-4 {
     transform: translateX(0%);
     opacity: 0.25;
 }
+
