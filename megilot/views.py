@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import uuid
 import pickle
 
-from flask import redirect, render_template, request, url_for, session
+from flask import redirect, render_template, request, url_for, session, flash
 
 from megilot import app
 from megilot import searchUtils as sutils
@@ -22,20 +22,16 @@ def mainPage():
 def search():
 
     if 'search_id' in session:
-        print('search id found '+session.get('search_id'))
         pickled_res_path = os.path.join(
             app.config['TEXT_UPLOADS'], session.get('search_id'), 'results.pickle')
         if os.path.exists(pickled_res_path):
             try:
                 os.unlink(pickled_res_path)
-                print('deleted previous pickle')
             except Exception as e:
-                print(e)
-                print('couldnt delete pickled results')
+                flash("Something went wrong. Sorry.", "danger")
                 return redirect(url_for('mainPage'))
 
         if request.files:
-            print('files exist in request')
         # Make sure there's a directory with session_id as it's name.
             search_path = os.path.join(
                 app.config['TEXT_UPLOADS'], session.get('search_id'))
@@ -43,12 +39,8 @@ def search():
                 try:
                     os.mkdir(search_path)
                 except OSError:
-                    print("Creation of the directory %s failed" %
-                            search_path)
+                    flash("Something went wrong. Sorry.", "danger")
                     return redirect(url_for('mainPage'))
-                else:
-                    print("Successfully created the directory %s " %
-                            search_path)
 
             # upload files
             uploaded_files = request.files.getlist("files")
@@ -56,11 +48,13 @@ def search():
             for f in uploaded_files:
 
                 if f.filename == "":
-                    print('file must have a filename')
+                    flash(
+                        "One of your files doesn't have a file name. Please enter valid files.", "danger")
                     return redirect(url_for('mainPage'))
 
                 if not fileUtils.allowed_file(f.filename):
-                    print('file extentention not allowed. only txt.')
+                    flash(
+                        "Seems like you used a text type that isn't allowed. Please only upload texts that end with '.txt'", "danger")
                     return redirect(url_for('mainPage'))
 
                 filename = secure_filename(f.filename)
@@ -68,14 +62,14 @@ def search():
                 filenames.append(filename)
 
     else:
-        print('search_id wasn\'t found while searching')
+        flash("Something went wrong. Sorry.", "danger")
         return redirect(url_for('mainPage'))
 
     search_params = {
         'letters': request.form['letters'], 'txt_length': request.form['text-length'], 'search_id': session.get('search_id', None)}
     if 'search_params' in session:
         session['search_params'] = search_params
-        session.modified=True
+        session.modified = True
     else:
         session['search_params'] = search_params
 
@@ -90,9 +84,8 @@ def searchResult():
 
     if 'search_params' in session:
         search_params = session.get('search_params', None)
-        print(search_params)
     else:
-        print('search params not found in session')
+        flash("Something went wrong. Sorry.", "danger")
         return redirect(url_for('mainPage'))
 
     # extract letters entered into a list, each row is a separate item.
@@ -107,53 +100,46 @@ def searchResult():
     window_r = int(window[1])
 
     if texts:
-        print('texts still exist in directory')
         # return list of all txt files in the url
         pickled_res_path = os.path.join(path, 'results.pickle')
         if os.path.exists(pickled_res_path):
-            print("results already exist as pickle")
             try:
-                pickle_in = open(pickled_res_path,'rb')
+                pickle_in = open(pickled_res_path, 'rb')
             except Exception as e:
-                print(e)
-                print('couldnt open pickled res')
+                flash("Something went wrong. Sorry.", "danger")
                 pickle_in.close()
-                return(redirect(url_for('mainPage'))) 
+                return(redirect(url_for('mainPage')))
             else:
                 results = pickle.load(pickle_in)
                 pickle_in.close()
-                print('succefully loaded pickled results')
-        else:
-            print("results found for first time:")
-            results = sutils.search_txt(texts, strings_list, window_l, window_r)
-            if results==None:
-                return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=results, is_main=False, filenames=None, cur_page = None)
+        else: #results found for the first time (no pickled results exist yet)
+            results = sutils.search_txt(
+                texts, strings_list, window_l, window_r)
+            if results == None:
+                return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=results, is_main=False, filenames=None, cur_page=None)
             try:
                 pickle_out = open(pickled_res_path, 'wb')
             except Exception as e:
-                print(e)
-                print('couldnt load pickled res')
+                flash("Something went wrong. Sorry.", "danger")
                 pickle_out.close()
                 return(redirect(url_for('mainPage')))
-            else:
+            else: #pickle the new results
                 pickle.dump(results, pickle_out)
                 pickle_out.close()
-                print('succefuly pickled result')
-                print("pickle exists is:")
-                print(os.path.exists(pickled_res_path))
 
         filenames = sorted(list(results.keys()))
         page = request.args.get('page', filenames[0], type=str)
         cur_res = results.get(page)
-        print(cur_res)
-        
-        return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res, is_main=False,  filenames=filenames, cur_page = page)
+
+        return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res, is_main=False,  filenames=filenames, cur_page=page)
     else:
-        print('re-enter text - session out. make a flush here Anat!')
+        flash("Oops, you're session timed-out. Please re-enter texts and search parameters", "danger")
         return(redirect(url_for('mainPage')))
 
 
 """Create new search id and store it in the current session."""
+
+
 def create_id():
     id = str(uuid.uuid1())
     session.pop('search_params', None)

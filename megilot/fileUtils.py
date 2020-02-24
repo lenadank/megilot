@@ -39,7 +39,6 @@ def clear_old_texts():
                     shutil.rmtree(os.path.join(app.config['TEXT_UPLOADS'], d))
                 except Exception as e:
                     print(e)
-                    print('Exception while trying to clear directory')
 
 def texts_from_dir(path):
     """Retrive a dictionary of texts representing every text in every txt file in path. 
@@ -60,7 +59,6 @@ def texts_from_dir(path):
                     text=f.read()
                 except OSError as e:
                     print(e)
-                    print('file dosnt exist anymore.')
                     return None
                 else:
                     res[filename]=text

@@ -10,6 +10,18 @@
         <h1 class="display-4 text-center text-light">המגילות</h1>
         <h1 class="lead text-center text-light">מנוע לחיפוש מקטעי טקסט</h1>
     </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     <form role="form" action="{{url_for('search')}}" method="POST" enctype="multipart/form-data">
         <div class="container p-0">
             <div class="form-group d-flex flex-row-reverse">
