@@ -22,20 +22,21 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
-    <form role="form" action="{{url_for('search')}}" method="POST" enctype="multipart/form-data">
+    <form role="form" action="{{url_for('search')}}" method="POST" enctype="multipart/form-data" id="form">
         <div class="container p-0">
-            <div class="form-group d-flex flex-row-reverse">
+            <div class="form-group d-flex flex-row-reverse" >
                 <label dir="rtl" lang="he" class="col-2 col-form-label text-center">תבנית
                     לחיפוש:</label>
-                <div class="col-8">
+                <div class="col-8" id ="custom-col">
                     <textarea class="form-control text-right" name="letters" id="letters" dir="rtl" lang="he"
                         type="text" rows='3' placeholder="יש להכניס כל סדרת אותיות חדשה בשורה חדשה"></textarea>
+                        <small id="letWarn" class="form-text text-right text-warning" dir='rtl'></small>
                 </div>
             </div>
             <div class="form-group d-flex flex-row-reverse">
                 <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">מספר
                     תווים במקטע:</label>
-                <div class="col-8">
+                <div class="col-8" id ="custom-col">
                     <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
                         <option>1-50</option>
                         <option>51-100</option>
@@ -46,15 +47,17 @@
             </div>
             <div class="form-group d-flex flex-row-reverse">
                 <label for="example-url-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">קבצים לחיפוש:</label>
-                <div class="col-8">
-                    <input type="file" class="custom-file-input" dir="rtl" name="files" id="files" multiple>
-                    <label class="custom-file-label" for="files" dir="rtl">בחר קבצים...</label>
+                <div class="col-8" id ="custom-col">
+                    <input type="file" class="custom-file-input" dir="rtl" name="files" id="files" multiple onchange="javascript:updateFilesNum()"/>
+                    <label id = "inputText" class="custom-file-label" for="files">Please select files to upload...</label>
+                    <small id="filesWarn" class="form-text text-right text-warning" dir='rtl'></small>
                 </div>
             </div>
-            <div class="d-flex justify-content-center p-3">
+            <div class="d-flex flex-row justify-content-center p-3">
                 <button class="snip1431">חיפוש</button>
             </div>
         </div>
     </form>
 </div>
+<script src="../static/JS/form.js"></script>
 {% endblock content %}

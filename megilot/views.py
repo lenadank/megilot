@@ -46,17 +46,6 @@ def search():
             uploaded_files = request.files.getlist("files")
             filenames = []
             for f in uploaded_files:
-
-                if f.filename == "":
-                    flash(
-                        "One of your files doesn't have a file name. Please enter valid files.", "danger")
-                    return redirect(url_for('mainPage'))
-
-                if not fileUtils.allowed_file(f.filename):
-                    flash(
-                        "Seems like you used a text type that isn't allowed. Please only upload texts that end with '.txt'", "danger")
-                    return redirect(url_for('mainPage'))
-
                 filename = secure_filename(f.filename)
                 f.save(os.path.join(search_path, filename))
                 filenames.append(filename)

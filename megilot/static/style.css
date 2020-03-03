@@ -59,6 +59,9 @@ a {
     color: #2e80b6
 }
 
+div#custom-col{
+    padding: 0px;
+}
 #header-override .scrollable-menu{
     height: auto;
     max-height: 200px;
