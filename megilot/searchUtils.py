@@ -262,7 +262,6 @@ def indices_to_text(indices, all_string_spans_list, text):
     end_span = all_string_spans_list[-1][indices[-1]][1]
     right_index = expand_passage_right(end_span, text)
     res.append(text[end_span[1]:right_index])
-    print(''.join(res))
     return res
 
 

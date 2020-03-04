@@ -55,7 +55,7 @@ def texts_from_dir(path):
             if filename!="results.pickle":
                 filepath=os.path.join(path,filename)
                 try:
-                    f=open(filepath, "r")
+                    f=open(filepath, mode='r', encoding="utf8")
                     text=f.read()
                 except OSError as e:
                     print(e)

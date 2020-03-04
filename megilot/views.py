@@ -3,6 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 import uuid
 import pickle
+import sys
 
 from flask import redirect, render_template, request, url_for, session, flash
 
@@ -28,6 +29,8 @@ def search():
             try:
                 os.unlink(pickled_res_path)
             except Exception as e:
+                print("failed unlinking pickled_res_path")
+                print(e)
                 flash("Something went wrong. Sorry.", "danger")
                 return redirect(url_for('mainPage'))
 
@@ -38,7 +41,9 @@ def search():
             if not os.path.exists(search_path):
                 try:
                     os.mkdir(search_path)
-                except OSError:
+                except OSError as e:
+                    print("Can't Make directory search_path")
+                    print(e)
                     flash("Something went wrong. Sorry.", "danger")
                     return redirect(url_for('mainPage'))
 
@@ -95,6 +100,8 @@ def searchResult():
             try:
                 pickle_in = open(pickled_res_path, 'rb')
             except Exception as e:
+                print("Failed opening pickled_res_path for reading")
+                print(e)
                 flash("Something went wrong. Sorry.", "danger")
                 pickle_in.close()
                 return(redirect(url_for('mainPage')))
@@ -105,10 +112,12 @@ def searchResult():
             results = sutils.search_txt(
                 texts, strings_list, window_l, window_r)
             if results == None:
-                return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=results, is_main=False, filenames=None, cur_page=None)
+                return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=results, is_main=False, filenames=None, cur_page=None)
             try:
                 pickle_out = open(pickled_res_path, 'wb')
             except Exception as e:
+                print("Failed opening pickled_res_path for writing")
+                print(e)
                 flash("Something went wrong. Sorry.", "danger")
                 pickle_out.close()
                 return(redirect(url_for('mainPage')))
@@ -120,7 +129,7 @@ def searchResult():
         page = request.args.get('page', filenames[0], type=str)
         cur_res = results.get(page)
 
-        return render_template('results.html', letters=strings, txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res, is_main=False,  filenames=filenames, cur_page=page)
+        return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res, is_main=False,  filenames=filenames, cur_page=page)
     else:
         flash("Oops, you're session timed-out. Please re-enter texts and search parameters", "danger")
         return(redirect(url_for('mainPage')))
