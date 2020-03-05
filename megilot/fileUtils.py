@@ -2,6 +2,7 @@ from megilot import app
 import os
 import datetime
 import shutil
+import docx
 
 
 def allowed_file(filename):
@@ -54,13 +55,28 @@ def texts_from_dir(path):
         for filename in os.listdir(path):
             if filename!="results.pickle":
                 filepath=os.path.join(path,filename)
-                try:
-                    f=open(filepath, mode='r', encoding="utf8")
-                    text=f.read()
-                except OSError as e:
-                    print(e)
-                    return None
+                if filename.endswith(".docx"):
+                    text = extractDocxTxt(filepath)
                 else:
-                    res[filename]=text
-                    f.close()
+                    try:
+                        f=open(filepath, mode='r', encoding="utf8")
+                        text=f.read()
+                    except OSError as e:
+                        print(e)
+                        return None
+                    else:
+                        f.close()
+                res[filename]=text
     return res
+
+def extractDocxTxt(filename):
+    fullText = []
+    try:
+        doc = docx.Document(filename)
+        for para in doc.paragraphs:
+            fullText.append(para.text)
+    except Exception as e:
+        print(e)
+        print("failed extracting text from .docx file")
+
+    return '\n'.join(fullText)

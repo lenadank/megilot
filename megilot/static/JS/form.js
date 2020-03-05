@@ -31,15 +31,15 @@ form.addEventListener('submit', (e)=>{
                 validFileName = false;
             }
 
-            var ext = filesList[i].name.slice(-3).toLowerCase(); 
-            if(!(ext==='txt'.toLowerCase())){
+            var fileName = filesList[i].name; 
+            if(!(fileName.endsWith(".txt")) && !(fileName.endsWith(".docx"))){
                 validFileExt = false;
             }
         }
 
         let fileNameWarning = [];
         if(!validFileExt){
-            fileNameWarning.push("יש לצרף קבצי טקסט בעלי סיומת txt בלבד");
+            fileNameWarning.push("יש לצרף קבצים בעלי סיומת docx או txt בלבד");
         }   
         if(!validFileName){
             fileNameWarning.push("שם אחד הקבצים המצורפים הינו ריק");

@@ -351,5 +351,4 @@ def search_txt(texts, strings_list, window_l, window_r):
     if all_pages:
         return all_pages
     else:
-        print('no results at all')
         return None
