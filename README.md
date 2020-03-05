@@ -29,7 +29,7 @@ In the fragment below, researches have concluded the upper word is “נפלאו
 
 ## Restrictions:
 
-1. Current version allows searching in .txt files only.
+1. Current version allows searching in .txt and .docx files only.
 2. Search session are restricted to 30 minutes - after 30 minutes users must upload the text files again. 
    
 ## Authors
