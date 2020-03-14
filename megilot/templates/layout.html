@@ -1,3 +1,10 @@
+{% set navigation_bar = [
+    ('mainPage', 'index', 'ראשי'),
+    ('mainPage', 'usage', 'כיצד משתמשים?'),
+    ('aboutPage', 'about', 'אודות'),
+    ('mainPage', 'contact', 'יצירת קשר')
+] -%}
+{% set active_page = active_page|default('index') -%}
 <!doctype html>
 <html lang="he">
 
@@ -31,18 +38,11 @@
             {% endif %}
             <div class="navbar-collapse collapse w-100">
                 <ul class="navbar-nav mr-auto flex-row-reverse">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('mainPage') }}">ראשי</a>
+                    {% for view, id, caption in navigation_bar %}
+                    <li{% if id == active_page %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+                        <a class="nav-link" href="{{ url_for(view) }}">{{ caption }}</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">כיצד משתמשים?</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">אודות</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">יצירת קשר</a>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="navbar-collapse collapse dual-collapse2 w-100 flex-row-reverse">
