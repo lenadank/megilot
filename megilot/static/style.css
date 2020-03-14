@@ -57,8 +57,8 @@ body .my-container {
 body .my-container2 {
     position: relative;
     top: 100px;
-    padding-left: 25%;
-    padding-right: 140px;
+    padding-left: 350px;
+    padding-right: 350px;
 }
 body .my-container3 {
     position: relative;
@@ -231,6 +231,6 @@ header .display-4 {
 #image{
     margin-bottom: 20px;
     margin-top: 20px;
-    width: 50%;
+    width: 60%;
     height: 50%;
 }
