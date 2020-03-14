@@ -16,7 +16,11 @@ from megilot import fileUtils
 def mainPage():
     fileUtils.clear_old_texts()  # remove all text files in texts\uploads
     create_id()
-    return render_template('index.html', is_main=True)
+    return render_template('index.html', is_main=True, active = "active")
+
+@app.route('/about', methods=['GET'])
+def aboutPage():
+    return render_template('about.html', active = "active")
 
 
 @app.route('/searching', methods=['POST'])

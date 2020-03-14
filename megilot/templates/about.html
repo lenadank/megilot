@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% set active_page = "about" %}
+
+{% block main_header %}
+<h2 class='display-4 pr-1 pl-3'>המגילות</h2>
+{% endblock main_header %}
+{% block content %}
+<div class="container-fluid my-container2 mb-3">
+<div class="flex-row-reverse d-flex justify-content-start">
+    <h2 id='h2Override' class='display-4' dir='rtl'>אודות "מגילות"</h2>
+</div>
+<div id="rowOverride" class="flex-row-reverse d-flex justify-content-start">
+    <p id = "pOverride" dir = 'rtl' class="font-weight-light text-right">"מגילות" הינו מנוע לחיפוש מחרוזות בתוך טקסטים. האתר מאפשר העלאת טקסטים, חיפוש מספר מחרוזות, חיפוש במספר טקסטים וחיפוש מתקדם. </p>
+</div>
+<div class="flex-row-reverse d-flex justify-content-start">
+    <h3 id='h3Override' class='display-4' dir='rtl'>למה להשתמש ב"מגילות"?</p>
+</div>
+<div id = 'rowOverride2' class="flex-row-reverse d-flex justify-content-start">
+    <p id = "pOverride" dir = 'rtl' class="font-weight-light text-right">לעומת מנועי חיפוש רגילים, מנוע החיפוש "מגילות" מאפשר חיפוש של מספר מחרוזות אשר לא חייבות להיות עוקבות בטקסט. הדבר שימושי למקרים בהם בידי המחפש\ת רק חלק קטן מהטקסט המלא. דוגמה אחת היא חיפוש קטעי טקסט בתנ"ך ממגילות ים המלח:
+        <img id = 'image' src="../static/scroll.png" class="rounded mx-auto d-block" alt="Scroll fragment">
+        בתמונה זו ניתן לראות קרע של אחת ממגילות ים המלח. אחת ממשימות האנשים החוקרים את המגילות הן לשייך קרעים אלה לטקסטים מהתנ"ך. החוקרים שיערו כי המילה העליונה היא "נפלאות". ניתן לחפש מילה זו באמצעות כלי חיפוש פשוטים אשר קיימים כמעט בכל תוכנת טקסט. הבעיה היא שעלולות להתקבל תוצאות חיפוש רבות שייאלצו את האדם המחפש להמשיך את החיפוש ידנית. אך בידי האדם המחפש פריט מידע נוסף – המילה שנמצאת בשורה מתחת למילה "נפלאות". החוקרים העריכו כי מדובר באותיות "לו". מנוע החיפוש "מגילות" מאפשר לחפש את המילה "נפלאות" ביחד עם "לו", למרות שהן נמצאות בשורות שונות בטקסט. חיפוש המילים ביחד, מביא לצמצום תוצאות החיפוש וזיהוי מקטע הטקסט המתאים בקלות רבה יותר. 
+    </p>
+</div>
+</div>
+{% endblock content %}
