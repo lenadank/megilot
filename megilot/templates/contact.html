@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% set active_page = "contact" %}
+
+{% block main_header %}
+<h2 class='display-4 pr-1 pl-3'>המגילות</h2>
+{% endblock main_header %}
+{% block content %}
+<div class="container-fluid my-container3 mb-3">
+<div class="flex-row-reverse d-flex justify-content-center">
+    <h2 id='h2Override' class='display-4' dir='rtl'>פרטים ליצירת קשר:</h2>
+</div>
+<div class="flex-row-reverse d-flex justify-content-start">
+    <p dir = 'rtl' class="font-weight-light text-right"> מצאתן\ם בעיה? יש לכן\ם שאלות? מוזמנים ומוזמנות ליצור איתי קשר ואנסה לתת מענה:
+    </p>
+</div>
+<div id="rowOverride" class="flex-row-reverse d-flex justify-content-start">
+    <p id = "pOverride" dir = 'rtl' class="font-weight-light text-right"> דוא"ל:   <a href="mailto:gilenson.anat@gmail.com">gilenson.anat@gmail.com</a>
+        <br>פרופיל לינקדאין:   <a href="https://www.linkedin.com/in/anatgilenson/">https://www.linkedin.com/in/anatgilenson</a>
+    </p>
+</div>
+</div>
+{% endblock content %}
