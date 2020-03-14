@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% set active_page = "usage" %}
+
+{% block main_header %}
+<h2 class='display-4 pr-1 pl-3'>המגילות</h2>
+{% endblock main_header %}
+{% block content %}
+<div class="container-fluid my-container4 mb-3">
+<div class="flex-row-reverse d-flex justify-content-center">
+    <h2 id='h2Override' class='display-4' dir='rtl'>מדריך לשימוש:</h2>
+</div>
+<div id="rowOverride" class="flex-row-reverse d-flex justify-content-start"> 
+    <ul dir='rtl' class="list-unstyled text-right font-weight-light">
+        <li id='liOverride2' dir='rtl'>על מנת לחפש מחרוזות בטקסט יש למלא שלושה שדות:</li>
+            <ul>
+                <li id='liOverride' dir='rtl'><strong>תבנית לחיפוש</strong> - יש להכניס מחרוזות לחיפוש. 
+                    הוספת מחרוזת בשורה חדשה תביא לחיפוש המחרוזת הבאה במרחק מסוים מהמחרוזת הקודמת.
+                    את טווח המרחק בין המחרוזות יש לציין בשדה "מרחק בין מחרוזות". 
+                    לדוגמה, אם ברצוני לחפש את המחרוזות "נפלאות" ו-"לוה" כאשר השנייה נמצאת בשורה מתחת לראשונה בטקסט, 
+                    אכניס את המילה "נפלאות" בשורה הראשונה, ארד שורה באמצעות מקש ה-"אנטר" ואכניס את המחרוזת "לוה". </li>
+                <li id='liOverride' dir='rtl'><strong>מרחק בין מחרוזות</strong> - יש להכניס מרחק משוער בין שתי מחרוזות אשר מופרדות בירידת שורה.</li>
+                <li id='liOverride' dir='rtl'><strong>קבצים לחיפוש</strong> - יש להכניס את קבצי הטקסט בהם יתבצע החיפוש. שימו לב! ניתן להכניס קבצים בעלי סיומת txt או docx בלבד! </li>
+            </ul>
+        <li id='liOverride2' dir='rtl'>חיפוש מתקדם:</li>
+        <li id='liOverride' dir='rtl'>במידה ואינך בטוח\ה לגבי אות אחת או יותר במחרוזת,
+             ניתן להכניס מספר אפשרויות לאות. זאת ניתן לעשות באצעות הכנסת גרשיים מרובעות ובהן את רשימת האותיות שיתכנו במחרוזת. 
+            למשל אם איני בטוחה האם המחרוזת "לו" מסתיימת באות "ה", "ג" או "ב", אוכל להכניס את המחרוזת "לו[הגב]". באופן זה המנוע יחפש את המחרוזת "לוה" וגם את המחרוזות "לוג" ו"לוב". 
+        ניתן לשרשר מספר סוגריים מרובעות יחדיו על מנת להגדיר מספר אפשרויות לרצף אותיות וכן ניתן להכניס את הסוגריים במספר מקומות במחרוזת.</li>
+    </ul>
+</div>
+</div>
+{% endblock content %}
