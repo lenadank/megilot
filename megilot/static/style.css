@@ -48,6 +48,13 @@ textarea{
     top: 60px;
 }
 
+body .index-container{
+    position: relative;
+    top: 120px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 body .my-container {
     position: relative;
     top: 79.4px;
