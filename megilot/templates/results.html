@@ -11,11 +11,7 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-right scrollable-menu" aria-labelledby="dropdownMenuButton">
         {% for name in filenames %}
-        {% if cur_page == page_name %}
-        <li><a class="dropdown-item active" href="{{ url_for('searchResult', page=name) }}">{{name}}</a></li>
-        {% else %}
         <li><a class="dropdown-item" href="{{ url_for('searchResult', page=name) }}">{{name}}</a></li>
-        {% endif %}
         {% endfor %}
     </ul>
 </div>
