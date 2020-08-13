@@ -8,7 +8,6 @@ megilot/static/texts/
 # C extensions
 *.so
 
-config.py
 .vscode/settings.json
 
 # Distribution / packaging
