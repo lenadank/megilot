@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 env/
 megilot/static/texts/
+!megilot/static/texts/.keep
+
 
 # C extensions
 *.so
