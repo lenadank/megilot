@@ -3,8 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 env/
-megilot/static/texts/
-!megilot/static/texts/.keep
+megilot/static/texts/admin/*
+megilot/static/texts/uploads/*
+!megilot/static/texts/uploads/.keep
 
 
 # C extensions
