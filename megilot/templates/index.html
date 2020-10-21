@@ -30,26 +30,42 @@
                     לחיפוש:</label>
                 <div class="col-8" id ="custom-col">
                     <textarea class="form-control text-right" name="letters" id="letters" dir="rtl" lang="he"
-                        type="text" rows='3' placeholder="יש להכניס כל סדרת אותיות חדשה בשורה חדשה"></textarea>
+                        type="text" rows='3' placeholder="נא להכניס כל סדרת אותיות חדשה בשורה חדשה"></textarea>
                         <small id="letWarn" class="form-text text-right text-warning" dir='rtl'></small>
                 </div>
             </div>
             <div class="form-group d-flex flex-row-reverse">
-                <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">מרחק בין מחרוזות:</label>
+                <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">אורך שורה:</label>
                 <div class="col-8" id ="custom-col">
                     <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
-                        <option>1-50</option>
-                        <option>51-100</option>
-                        <option>101-150</option>
-                        <option>151-200</option>
+                        <option>1-10</option>
+                        <option>11-20</option>
+                        <option>21-30</option>
+                        <option>31-40</option>
+                        <option>41-50</option>
+                        <option>51-60</option>
+                        <option>61-70</option>
+                        <option>71-80</option>
+                        <option>81-90</option>
+                        <option>91-100</option>
                     </select>
                 </div>
             </div>
             <div class="form-group d-flex flex-row-reverse">
+                <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">קבצים לחיפוש:</label>
+                <div class="col-8" id ="custom-col">
+                    <select onchange="changeTextLoader();" class="form-control text-right" dir="rtl" name="input_files" id="input_files">
+                        <option>תנ״ך</option>
+                        <option>קבצים חיצוניים</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group d-flex flex-row-reverse">
                 <label for="example-url-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">קבצים לחיפוש:</label>
                 <div class="col-8" id ="custom-col">
-                    <input type="file" class="custom-file-input" dir="rtl" name="files" id="files" multiple onchange="javascript:updateFilesNum()"/>
-                    <label id = "inputText" class="custom-file-label" for="files">Please select files to upload...</label>
+                    <input type="file" class="custom-file-input" dir="rtl" name="files" disabled = "true" id="files" multiple onchange="javascript:updateFilesNum()"/>
+                    <label id = "inputText" class="custom-file-label" for="files" disabled = "true" >Please select files to upload...</label>
                     <small id="filesWarn" class="form-text text-right text-warning" dir='rtl'></small>
                 </div>
             </div>

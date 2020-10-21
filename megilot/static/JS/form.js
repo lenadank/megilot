@@ -4,6 +4,21 @@ const letInput = document.getElementById('letters');
 const filesWarn = document.getElementById('filesWarn');
 const letWarn = document.getElementById('letWarn');
 
+
+function changeTextLoader() {
+        var e = document.getElementById("input_files");
+        var selected_input_option = e.options[e.selectedIndex].value;
+        if(selected_input_option == "קבצים חיצוניים") {
+            document.getElementById("files").disabled = false
+            document.getElementById("inputText").disabled = false
+
+        }
+        else{
+            document.getElementById("files").disabled = true
+            document.getElementById("inputText").disabled = true
+        }
+}
+
 function inValid(input,inputWarn,text, e){
     e.preventDefault();
     inputWarn.innerHTML = "<i class='fas fa-exclamation-triangle'></i>" +"   "+text;
@@ -14,24 +29,28 @@ form.addEventListener('submit', (e)=>{
     const filesList = filesInput.files;
     letWarn.innerText='';
     filesWarn.innerText='';
-
-    //validate letters input field isn't empty
+            //validate letters input field isn't empty
     if(letInput.value === "" || letInput.value == null){
         e.preventDefault();
         inValid(letInput, letWarn, "יש להכניס לפחות אות אחת לחיפוש", e);
     }
+
+    var e = document.getElementById("input_files");
+    var selected_input_option = e.options[e.selectedIndex].value;
+
+    if(selected_input_option == "קבצים חיצוניים"){
     if(filesList.length==0 || filesList==null){
         inValid(filesInput, filesWarn, "יש לבחור לפחות קובץ אחד", e);
     }else{
         let validFileExt = true;
         let validFileName = true;
-        for(let i=0; i<filesList.length; i++){  
+        for(let i=0; i<filesList.length; i++){
             let fileNameArr = filesList[i].name.split('.');
             if(fileNameArr[0]===''){
                 validFileName = false;
             }
 
-            var fileName = filesList[i].name; 
+            var fileName = filesList[i].name;
             if(!(fileName.endsWith(".txt")) && !(fileName.endsWith(".docx"))){
                 validFileExt = false;
             }
@@ -40,7 +59,7 @@ form.addEventListener('submit', (e)=>{
         let fileNameWarning = [];
         if(!validFileExt){
             fileNameWarning.push("יש לצרף קבצים בעלי סיומת docx או txt בלבד");
-        }   
+        }
         if(!validFileName){
             fileNameWarning.push("שם אחד הקבצים המצורפים הינו ריק");
         }
@@ -48,8 +67,11 @@ form.addEventListener('submit', (e)=>{
             let warningText = fileNameWarning.join(', ')
             inValid(filesInput, filesWarn, warningText, e);
         }
-        
+
     }
+
+    }
+
 });
 
 //Make file uploader responsive

@@ -37,27 +37,31 @@ def remove_nikud(txt):
 
     return txt
 
-
-def create_pattern(string):
-    '''Create a regex pattern to search strings inside Hebrew text with nikud. Return a string.'''
-    
+def create_sub_pattern_with_nikud(string):
     #create a list of the string splitted by letters or [] with a string inside
-    #for exapmle if string is 'he[ll]o', strings=['h','e','[ll],'o'] 
-    strings=[]
+    #for exapmle if string is 'he[ll]o', strings=['h','e','[ll],'o']
+    strings = []
     p = re.compile('(\[[א-ת]+\])')
     temp_strings = p.split(string)
     for s in temp_strings:
-	    if '[' in s:
-		    strings.append(s)
-	    else:
-		    strings.extend(list(s))
+        if '[' in s:
+            strings.append(s)
+        else:
+            strings.extend(list(s))
 
-    #create a pattern from strings. Have zero or more nikud chars after each element (letter or [] with a string inside)
+    # create a pattern from strings. Have zero or more nikud chars after each element (letter or [] with a string inside)
     pattern = ''
     for string in strings:
-        pattern = pattern+string+r'[\u0591-\u05c7]*'
+        pattern = pattern + string + r'[\u0591-\u05c7]*'
     return pattern
 
+
+def create_pattern(string):
+    '''Create a regex pattern to search strings inside Hebrew text with nikud. Return a string.'''
+    str_list = string.split("*")
+    star = r'(.[\u0591-\u05c7]*){0,3}'
+    pattern = star.join([create_sub_pattern_with_nikud(s) for s in str_list])
+    return pattern
 
 def single_string_spans(text, string, nikud=False):
     """Get enumperated spans of apearances of a single string in text. 
@@ -70,10 +74,11 @@ def single_string_spans(text, string, nikud=False):
     Returns:
         list: enumerated spans.
     """
-
     if nikud:
         p = re.compile(create_pattern(string))
     else:
+        string = string.replace("*",
+                                ".{0,3}")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
         p = re.compile(string)
     matches = p.finditer(text)
     res = list(enumerate([match.span() for match in matches]))

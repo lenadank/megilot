@@ -4,19 +4,31 @@ from werkzeug.utils import secure_filename
 import uuid
 import pickle
 import sys
-
+import glob
 from flask import redirect, render_template, request, url_for, session, flash
-
+import shutil
 from megilot import app
 from megilot import searchUtils as sutils
 from megilot import fileUtils
+import csv
+
+
+
+def dir_last_updated(folder):
+    return str(max(os.path.getmtime(os.path.join(root_path, f))
+                   for root_path, dirs, files in os.walk(folder)
+                   for f in files))
+
+
+def get_bible_files(folder):
+    return glob.glob("%s/*.txt" % folder)
 
 
 @app.route('/', methods=['GET'])
 def mainPage():
     fileUtils.clear_old_texts()  # remove all text files in texts\uploads
     create_id()
-    return render_template('index.html', is_main=True)
+    return render_template('index.html', last_updated = dir_last_updated('megilot/static'), is_main=True)
 
 @app.route('/about', methods=['GET'])
 def aboutPage():
@@ -46,22 +58,34 @@ def search():
                 flash("Something went wrong. Sorry.", "danger")
                 return redirect(url_for('mainPage'))
 
-        if request.files:
+        #if request.files:
         # Make sure there's a directory with session_id as it's name.
-            search_path = os.path.join(
-                app.config['TEXT_UPLOADS'], session.get('search_id'))
-            if not os.path.exists(search_path):
-                try:
-                    os.mkdir(search_path)
-                except OSError as e:
-                    print("Can't Make directory search_path")
-                    print(e)
-                    flash("Something went wrong. Sorry.", "danger")
-                    return redirect(url_for('mainPage'))
+        search_path = os.path.join(
+            app.config['TEXT_UPLOADS'], session.get('search_id'))
+        if not os.path.exists(search_path):
+            try:
+                os.mkdir(search_path)
+            except OSError as e:
+                print("Can't Make directory search_path")
+                print(e)
+                flash("Something went wrong. Sorry.", "danger")
+                return redirect(url_for('mainPage'))
 
             # upload files
+        filenames = []
+        if "input_files" in request.form:
+            app.config["input_files"] = request.form["input_files"]
+        elif "input_files" not in app.config:
+            app.config["input_files"] = "תנ״ך"
+        if app.config["input_files"] == "תנ״ך":
+            uploaded_files = get_bible_files(os.path.join(app.config['TEXT_UPLOADS'], "../bible"))
+            for f in uploaded_files:
+                simple_name = os.path.join(os.path.basename(os.path.dirname(f)), os.path.basename(f))
+                filename = secure_filename(simple_name)
+                shutil.copyfile(f, (os.path.join(search_path, filename)))
+                filenames.append(filename)
+        else:
             uploaded_files = request.files.getlist("files")
-            filenames = []
             for f in uploaded_files:
                 filename = secure_filename(f.filename)
                 f.save(os.path.join(search_path, filename))
@@ -80,6 +104,15 @@ def search():
         session['search_params'] = search_params
 
     return redirect(url_for('searchResult'))
+
+def save_results_to_csv(results, csv_file_name):
+    with open(csv_file_name, mode='w', encoding="utf8") as results_file:
+        results_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for f, lines in results.items():
+            for line in lines[0]:
+                for l in line:
+                    results_writer.writerow([f, " ".join(l).replace("\r\n", " ").replace("\n", " ")])
+
 
 
 @app.route('/results', methods=['GET'])
@@ -108,6 +141,7 @@ def searchResult():
     if texts:
         # return list of all txt files in the url
         pickled_res_path = os.path.join(path, 'results.pickle')
+        csv_results_path = os.path.join(path, 'results.csv')
         if os.path.exists(pickled_res_path):
             try:
                 pickle_in = open(pickled_res_path, 'rb')
@@ -136,12 +170,13 @@ def searchResult():
             else: #pickle the new results
                 pickle.dump(results, pickle_out)
                 pickle_out.close()
-
+        save_results_to_csv(results, csv_results_path)
         filenames = sorted(list(results.keys()))
         page = request.args.get('page', filenames[0], type=str)
         cur_res = results.get(page)
-
-        return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res, is_main=False,  filenames=filenames, cur_page=page)
+        csv_results_path = "../static/" + csv_results_path.split("static/")[1]
+        return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res,
+                               is_main=False,  filenames=filenames, cur_page=page, output_csv_file=csv_results_path)
     else:
         flash("Oops, you're session timed-out. Please re-enter texts and search parameters", "danger")
         return(redirect(url_for('mainPage')))
