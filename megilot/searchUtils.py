@@ -79,7 +79,7 @@ def single_string_spans(text, string, nikud=False):
     else:
         #"[u05d0-u05f2]"
         string = string.replace("*",
-                                ".{0,3}").replace("?", "\S")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
+                                ".{0,3}").replace("?", "\S").replace("]", "]?")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
         p = re.compile(string)
     matches = p.finditer(text)
     res = list(enumerate([match.span() for match in matches]))
