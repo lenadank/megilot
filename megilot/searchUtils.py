@@ -77,8 +77,9 @@ def single_string_spans(text, string, nikud=False):
     if nikud:
         p = re.compile(create_pattern(string))
     else:
+        #"[u05d0-u05f2]"
         string = string.replace("*",
-                                ".{0,3}")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
+                                ".{0,3}").replace("?", "\S")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
         p = re.compile(string)
     matches = p.finditer(text)
     res = list(enumerate([match.span() for match in matches]))
@@ -333,21 +334,21 @@ def search_txt(texts, strings_list, window_l, window_r):
     """
     all_pages = {}
     for text_name, text in texts.items():
-        no_nikud_txt = remove_nikud(text)
-        spans_for_search = all_strings_spans(no_nikud_txt, strings_list)
-        spans_nikud = all_strings_spans(text, strings_list, True)
+        #no_nikud_txt = remove_nikud(text)
+        spans_for_search = all_strings_spans(text, strings_list)
+        #spans_nikud = all_strings_spans(text, strings_list)
         # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
-        if spans_nikud == None or spans_for_search == None:
+        if  spans_for_search == None:
             continue
 
         if len(strings_list) == 1:
-            final, num_res = single_string_search(spans_nikud, text)
+            final, num_res = single_string_search(spans_for_search, text)
         else:
             result = search_rec_raw(
                 window_l, window_r, spans_for_search[0], spans_for_search, 0)
             # result isn't an empty list -> some results were found.
             if result:
-                final, num_res = get_final_results(result, spans_nikud, text)
+                final, num_res = get_final_results(result, spans_for_search, text)
             else:  # result is an empty list -> no results for the search.
                 continue
 
