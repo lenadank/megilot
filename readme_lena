@@ -1,0 +1,4 @@
+1. source ../megilot_env/bin/activate.csh
+2. setenv FLASK_APP run
+3. setenv LD_LIBRARY_PATH /usr/local/lib/openssl-1.1.1a/lib
+4. flask run -p 40332 -h delta-tomcat-vm.cs.tau.ac.il 
