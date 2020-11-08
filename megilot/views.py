@@ -111,6 +111,7 @@ def save_results_to_csv(results, csv_file_name):
         for f, lines in results.items():
             for line in lines[0]:
                 for l in line:
+                    l = ["*" + x + "*" if i%2 ==1 else x for i, x in enumerate(l) ]
                     results_writer.writerow([f, " ".join(l).replace("\r\n", " ").replace("\n", " ")])
 
 
@@ -174,6 +175,18 @@ def searchResult():
         filenames = sorted(list(results.keys()))
         page = request.args.get('page', filenames[0], type=str)
         cur_res = results.get(page)
+        #handle index
+        for text in texts:
+            if text.endswith("index.txt"):
+                headers = texts[text].split("\n")
+                index = []
+                for i in cur_res[2]:
+                    index.append([headers[x] for x in i])
+                cur_res = (cur_res[0], cur_res[1], index)
+                break
+        else:
+            cur_res = (cur_res[0], cur_res[1], None)
+
         csv_results_path = "../static/" + csv_results_path.split("static/")[1]
         return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res,
                                is_main=False,  filenames=filenames, cur_page=page, output_csv_file=csv_results_path)

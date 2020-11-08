@@ -308,16 +308,20 @@ def get_final_results(result, all_string_spans_list, text):
     num_res = len(result)
     grouped_spans = group_by_first_string_raw(result)
     final_res = []
+    start_indices = []
     for group in grouped_spans:
         paragraphs_group = []
+        paragraph_indices = []
         for indices in group:
             cur_parag = indices_to_text(indices, all_string_spans_list, text)
             paragraphs_group.append(cur_parag)
+            paragraph_indices.append(all_string_spans_list[0][indices[0]][1][0])
         final_res.append(paragraphs_group)
-    return (final_res, num_res)
+        start_indices.append(paragraph_indices)
+    return (final_res, num_res, start_indices)
 
 
-def search_txt(texts, strings_list, window_l, window_r):
+def search_txt(texts, strings_list, window_l, window_r, index=True):
     """Find passeges in text containing each string from strings_list in an ordered way and with a space of
     minimum window_l charcters and maximum window_r charcters inbetween each string. Return each passage represented as 
     a list of strings, which when combined together form the passege. Currently supports search in Hebrew text only.
@@ -343,16 +347,23 @@ def search_txt(texts, strings_list, window_l, window_r):
 
         if len(strings_list) == 1:
             final, num_res = single_string_search(spans_for_search, text)
+            start_spans = []
+            for s in spans_for_search:
+                start_span = [x[1][0] for x in s]
+                start_spans.append(start_span)
         else:
             result = search_rec_raw(
                 window_l, window_r, spans_for_search[0], spans_for_search, 0)
             # result isn't an empty list -> some results were found.
             if result:
-                final, num_res = get_final_results(result, spans_for_search, text)
+                final, num_res, start_spans = get_final_results(result, spans_for_search, text)
             else:  # result is an empty list -> no results for the search.
                 continue
-
-        all_pages[text_name] = (final, num_res)
+        for s in start_spans:
+            for i in range(len(s)):
+                line_index = text[:s[i]].count("\n")
+                s[i] = line_index
+        all_pages[text_name] = (final, num_res, start_spans)
 
     if all_pages:
         return all_pages
