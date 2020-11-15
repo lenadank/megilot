@@ -97,7 +97,11 @@
                                     <a href="#" data-toggle="collapse" data-target="#collapse{{outer.index}}"
                                         aria-expanded="true" class="">
                                         <i class="icon-action fa fa-chevron-down"></i>
+                                         {% if result[2] is none -%}
                                         <h6 class="title" dir='rtl'>מקטע {{outer.index}} - תוצאה 1</h6>
+                                        {%- else -%}
+                                        <h6 class="title" dir='rtl'>{{result[2][outer.index-1][0]}}</h6>
+                                        {%- endif %}
                                     </a>
                                 </header>
                                 <div class="filter-content collapse show" id="collapse{{outer.index}}">
@@ -121,7 +125,12 @@
                                         data-target="#collapse{{outer.index}}-{{loop.index}}" aria-expanded="true"
                                         class=''>
                                         <i class="icon-action fa fa-chevron-down"></i>
+                                         {% if result[2] is none -%}
                                         <h6 class="title" dir="rtl">תוצאה {{i+1}}</h6>
+                                                                                {%- else -%}
+                                        <h6 class="title" dir='rtl'>{{result[2][outer.index-1][i]}}</h6>
+
+                                        {%- endif %}
                                     </a>
                                 </header>
                                 <div class="filter-content collapse show" id="collapse{{outer.index}}-{{loop.index}}">
