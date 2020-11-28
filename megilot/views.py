@@ -96,7 +96,7 @@ def search():
         return redirect(url_for('mainPage'))
 
     search_params = {
-        'letters': request.form['letters'], 'txt_length': request.form['text-length'], 'search_id': session.get('search_id', None)}
+        'letters': request.form['letters'], 'txt_length': request.form['minRow']+"-"+request.form['maxRow'], 'search_id': session.get('search_id', None)}
     if 'search_params' in session:
         session['search_params'] = search_params
         session.modified = True

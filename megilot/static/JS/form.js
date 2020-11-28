@@ -3,6 +3,16 @@ const filesInput = document.getElementById('files');
 const letInput = document.getElementById('letters');
 const filesWarn = document.getElementById('filesWarn');
 const letWarn = document.getElementById('letWarn');
+const minRowLenInput = document.getElementById("minRow");
+const maxRowLenInput = document.getElementById("maxRow");
+const lenWarn = document.getElementById('lenWarn');
+
+
+function isNumeric(myStr) {
+  if (typeof myStr != "string") return false // we only process strings!
+  return !isNaN(myStr) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseInt(myStr)) // ...and ensure strings of whitespace fail
+}
 
 
 function changeTextLoader() {
@@ -29,7 +39,18 @@ form.addEventListener('submit', (e)=>{
     const filesList = filesInput.files;
     letWarn.innerText='';
     filesWarn.innerText='';
-            //validate letters input field isn't empty
+
+    if (!isNumeric(minRowLenInput.value) || !isNumeric(maxRowLenInput.value)){
+        e.preventDefault();
+        inValid(lenWarn, lenWarn, "אורכי שורה צריכים להיות מספרים חוקיים", e);
+    }
+
+    if (parseInt(minRowLenInput.value) >= parseInt(maxRowLenInput.value)){
+        e.preventDefault();
+        inValid(lenWarn, lenWarn, "אורך שורה מקסימלי צריך להיות גדול יותר מערך שורה מינימלי", e);
+    }
+
+    //validate letters input field isn't empty
     if(letInput.value === "" || letInput.value == null){
         e.preventDefault();
         inValid(letInput, letWarn, "יש להכניס לפחות אות אחת לחיפוש", e);

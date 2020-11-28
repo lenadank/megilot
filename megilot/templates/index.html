@@ -34,23 +34,26 @@
                         <small id="letWarn" class="form-text text-right text-warning" dir='rtl'></small>
                 </div>
             </div>
-            <div class="form-group d-flex flex-row-reverse">
-                <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">אורך שורה:</label>
-                <div class="col-8" id ="custom-col">
-                    <select class="form-control text-right" dir="rtl" name="text-length" id="text-length">
-                        <option>1-10</option>
-                        <option>11-20</option>
-                        <option>21-30</option>
-                        <option>31-40</option>
-                        <option>41-50</option>
-                        <option>51-60</option>
-                        <option>61-70</option>
-                        <option>71-80</option>
-                        <option>81-90</option>
-                        <option>91-100</option>
-                    </select>
+            <div class="row-1" dir="rlt" >
+                <div class="form-group d-flex flex-row-reverse" >
+                    <label dir="rtl" lang="he" class="col-2 col-form-label text-center">אורך שורה:</label>
+                    <div class="col-2" id ="custom-col">
+                        <textarea class="form-control text-right" name="minRow" id="minRow" dir="rtl" lang="he"
+                            type="text" rows='1' placeholder="אורך מינימלי"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex flex-row-reverse" >
+                    <label dir="rtl" lang="he" class="col-2 col-form-label text-center"> </label>
+                    <div class="col-2" id ="custom-col">
+                        <textarea class="form-control text-right" name="maxRow" id="maxRow" dir="rtl" lang="he"
+                            type="text" rows='1' placeholder="אורך מקסימלי"placeholder="אורך מינימלי"></textarea>
+                            <small id="lenWarn" class="form-text text-right text-warning" dir='rtl'></small>
+                    </div>
                 </div>
             </div>
+
+
             <div class="form-group d-flex flex-row-reverse">
                 <label for="example-number-input" dir="rtl" lang="he" class="col-2 col-form-label text-center">קבצים לחיפוש:</label>
                 <div class="col-8" id ="custom-col">

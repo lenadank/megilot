@@ -16,7 +16,7 @@ def strip_strings(strings):
     """
     res = []
     for s in strings:
-        res.append(s.strip())
+        res.append(s.strip("\t|\n"))
     return res
 
 
