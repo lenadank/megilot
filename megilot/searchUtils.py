@@ -347,11 +347,16 @@ def search_txt(texts, strings_list, window_l, window_r, index=True):
             continue
 
         if len(strings_list) == 1:
+
             final, num_res = single_string_search(spans_for_search, text)
             start_spans = []
-            for s in spans_for_search:
-                start_span = [x[1][0] for x in s]
-                start_spans.append(start_span)
+            i = 0
+            for same_sequence in final:
+                start_spans.append([x[1][0] for x in spans_for_search[0][i: i+len(same_sequence)]])
+                i += len(same_sequence)
+            #for s in spans_for_search:
+                #start_span = [x[1][0] for x in s]
+                #start_spans.append(start_span)
         else:
             result = search_rec_raw(
                 window_l, window_r, spans_for_search[0], spans_for_search, 0)
