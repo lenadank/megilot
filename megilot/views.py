@@ -188,7 +188,9 @@ def searchResult():
             cur_res = (cur_res[0], cur_res[1], None)
 
         csv_results_path = "../static/" + csv_results_path.split("static/")[1]
-        return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=cur_res,
+        return render_template('results.html', letters=strings,
+                               min_row_len = window[0], max_row_len=window[1], txt_length=txt_length, title='Search Results',
+                               header="תוצאות חיפוש", result=cur_res,
                                is_main=False,  filenames=filenames, cur_page=page, output_csv_file=csv_results_path)
     else:
         flash("Oops, you're session timed-out. Please re-enter texts and search parameters", "danger")

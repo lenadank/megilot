@@ -336,6 +336,7 @@ def search_txt(texts, strings_list, window_l, window_r, index=True):
         (list, int): list of lists representing grouped passages. Each group contains lists of strings which when combined
         together form a single passege - a result.
     """
+
     all_pages = {}
     for text_name, text in texts.items():
         #no_nikud_txt = remove_nikud(text)
