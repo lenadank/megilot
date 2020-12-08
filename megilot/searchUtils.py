@@ -63,6 +63,13 @@ def create_pattern(string):
     pattern = star.join([create_sub_pattern_with_nikud(s) for s in str_list])
     return pattern
 
+
+def build_single_string_regex(string):
+    string = string.replace("*",
+                            ".{0,3}").replace("?", "\S").replace("]",
+                                                                 "]?")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
+    return string
+
 def single_string_spans(text, string, nikud=False):
     """Get enumperated spans of apearances of a single string in text. 
 
@@ -321,7 +328,53 @@ def get_final_results(result, all_string_spans_list, text):
     return (final_res, num_res, start_indices)
 
 
-def search_txt(texts, strings_list, window_l, window_r, index=True):
+def new_search_txt(texts, strings_list,min_row_len, max_row_len):
+    search_offset = 20
+    strings_regex = [f"({build_single_string_regex(x)})" for x in strings_list]
+    regex_for_search = f"(.{{{max(0, min_row_len-20)},{max_row_len}}})".join(strings_regex)
+    p = re.compile(regex_for_search)
+    all_pages = {}
+    num_res = 0
+    for text_name, text in texts.items():
+        all_texts = []
+        all_start_spans = []
+        for match in p.finditer(text):
+            num_res +=1
+            curr_match_spans = []
+            curr_match_texts = []
+            for i in range(1, 2*len(strings_list)):
+                curr_match_texts.append(match.group(i))
+                curr_match_spans.append(match.regs[i])
+            #check spans:
+            for i in range(1, len(curr_match_spans), 2):
+                curr_end = curr_match_spans[i][1]
+                prev_start = curr_match_spans[i-1][0]
+                line_len = curr_end-prev_start+1
+                if  min_row_len <= line_len <= max_row_len:
+                    continue
+            start = curr_match_spans[0]
+            expansion_from_start = expand_passage_left(start, text)
+            curr_match_texts.append(text[expansion_from_start:start[0]])
+            end = curr_match_spans[-1]
+            expansion_from_end = expand_passage_right(end, text)
+            curr_match_texts.append(text[end[1]:expansion_from_end])
+            all_texts.append([curr_match_texts])
+            all_start_spans.append([start[0]])
+        for s in all_start_spans:
+            for i in range(len(s)):
+                line_index = text[:s[i]].count("\n")
+                s[i] = line_index
+        all_pages[text_name] = (all_texts, num_res, all_start_spans)
+
+    if all_pages:
+        return all_pages
+    else:
+        return None
+
+
+
+def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
+    new_search_txt(texts,strings_list, min_row_len, max_row_len)
     """Find passeges in text containing each string from strings_list in an ordered way and with a space of
     minimum window_l charcters and maximum window_r charcters inbetween each string. Return each passage represented as 
     a list of strings, which when combined together form the passege. Currently supports search in Hebrew text only.
@@ -329,8 +382,8 @@ def search_txt(texts, strings_list, window_l, window_r, index=True):
     Args:
         texts (str): text to search in.
         strings_list (list): strings to search in text.
-        window_l (int): minimum  distance between each string.
-        window_r (int): maximum distance between each string. 
+        min_row_len (int): minimum  distance between each string.
+        max_row_len (int): maximum distance between each string.
 
     Returns:
         (list, int): list of lists representing grouped passages. Each group contains lists of strings which when combined
@@ -359,7 +412,7 @@ def search_txt(texts, strings_list, window_l, window_r, index=True):
                 #start_spans.append(start_span)
         else:
             result = search_rec_raw(
-                window_l, window_r, spans_for_search[0], spans_for_search, 0)
+                min_row_len, max_row_len, spans_for_search[0], spans_for_search, 0)
             # result isn't an empty list -> some results were found.
             if result:
                 final, num_res, start_spans = get_final_results(result, spans_for_search, text)

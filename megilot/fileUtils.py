@@ -53,7 +53,7 @@ def texts_from_dir(path):
     res={}
     if os.path.exists(path):
         for filename in os.listdir(path):
-            if filename !="results.pickle" and filename != "results.csv":
+            if filename !="results.pickle" and filename != "results.csv" :
                 filepath=os.path.join(path,filename)
                 if filename.endswith(".docx"):
                     text = extractDocxTxt(filepath)
