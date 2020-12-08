@@ -328,10 +328,10 @@ def get_final_results(result, all_string_spans_list, text):
     return (final_res, num_res, start_indices)
 
 
-def new_search_txt(texts, strings_list,min_row_len, max_row_len):
+def search_txt(texts, strings_list,min_row_len, max_row_len):
     search_offset = 20
     strings_regex = [f"({build_single_string_regex(x)})" for x in strings_list]
-    regex_for_search = f"(.{{{max(0, min_row_len-20)},{max_row_len}}})".join(strings_regex)
+    regex_for_search = f"(.{{{max(0, min_row_len-search_offset)},{max_row_len}}})".join(strings_regex)
     p = re.compile(regex_for_search)
     all_pages = {}
     num_res = 0
@@ -353,10 +353,10 @@ def new_search_txt(texts, strings_list,min_row_len, max_row_len):
                 if  min_row_len <= line_len <= max_row_len:
                     continue
             start = curr_match_spans[0]
-            expansion_from_start = expand_passage_left(start, text)
-            curr_match_texts.append(text[expansion_from_start:start[0]])
+            expansion_from_start = expand_passage_left(start, text, 12)
+            curr_match_texts = [text[expansion_from_start:start[0]]] + curr_match_texts
             end = curr_match_spans[-1]
-            expansion_from_end = expand_passage_right(end, text)
+            expansion_from_end = expand_passage_right(end, text, 12)
             curr_match_texts.append(text[end[1]:expansion_from_end])
             all_texts.append([curr_match_texts])
             all_start_spans.append([start[0]])
@@ -373,8 +373,7 @@ def new_search_txt(texts, strings_list,min_row_len, max_row_len):
 
 
 
-def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
-    new_search_txt(texts,strings_list, min_row_len, max_row_len)
+def old_search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
     """Find passeges in text containing each string from strings_list in an ordered way and with a space of
     minimum window_l charcters and maximum window_r charcters inbetween each string. Return each passage represented as 
     a list of strings, which when combined together form the passege. Currently supports search in Hebrew text only.
