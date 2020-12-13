@@ -70,7 +70,7 @@ def build_single_string_regex(string):
                                                                  "]?")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
     return string
 
-def single_string_spans(text, string, nikud=False):
+def single_string_spans(text, string, offset = 0):
     """Get enumperated spans of apearances of a single string in text. 
 
     Args:
@@ -81,20 +81,19 @@ def single_string_spans(text, string, nikud=False):
     Returns:
         list: enumerated spans.
     """
-    if nikud:
-        p = re.compile(create_pattern(string))
-    else:
-        #"[u05d0-u05f2]"
-        string = string.replace("*",
+    #"[u05d0-u05f2]"
+    string = string.replace("*",
                                 ".{0,3}").replace("?", "\S").replace("]", "]?")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
-        p = re.compile(string)
+    p = re.compile(string)
     matches = p.finditer(text)
-    res = list(enumerate([match.span() for match in matches]))
+    def add_offset_to_span(span, offset):
+        return (span[0] + offset, span[1] + offset)
+    res = list(enumerate([add_offset_to_span(match.span(), offset) for match in matches]))
 
     return res
 
 
-def all_strings_spans(text, strings_list, nikud=False):
+def all_strings_spans(text, strings_list, spans_from_regex, max_row_len):
     """Get list of lists contating spans of apearances in text for all strings in strings_list.
 
     Args:
@@ -107,13 +106,15 @@ def all_strings_spans(text, strings_list, nikud=False):
             or None if one of the strings wasn't found. (one of the lists is empty).
     """
     result = []
-    for string in strings_list:
-        cur = single_string_spans(text, string, nikud)
-        if cur:
-            result.append(cur)
-        else:  # one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
-            return None
-    return result
+    for span_from_regex in spans_from_regex:
+        curr_text = text[span_from_regex: span_from_regex + max_row_len*(len(strings_list) + 1)]
+        for string in strings_list:
+            cur = single_string_spans(curr_text, string, offset=span_from_regex)
+            if cur:
+                result.append(cur)
+            else:  # one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
+                return None
+        return result
 
 
 def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
@@ -328,52 +329,27 @@ def get_final_results(result, all_string_spans_list, text):
     return (final_res, num_res, start_indices)
 
 
-def search_txt(texts, strings_list,min_row_len, max_row_len):
+def search_txt_regex(texts, strings_list,min_row_len, max_row_len):
     search_offset = 20
-    strings_regex = [f"({build_single_string_regex(x)})" for x in strings_list]
+    strings_regex = [build_single_string_regex(x) for x in strings_list]
+    strings_regex = [f"({x})"  if not x.startswith("(") else x for x in strings_regex]
     regex_for_search = f"(.{{{max(0, min_row_len-search_offset)},{max_row_len}}})".join(strings_regex)
     p = re.compile(regex_for_search)
-    all_pages = {}
+    all_pages_spans = {}
     num_res = 0
     for text_name, text in texts.items():
-        all_texts = []
         all_start_spans = []
         for match in p.finditer(text):
-            num_res +=1
-            curr_match_spans = []
-            curr_match_texts = []
-            for i in range(1, 2*len(strings_list)):
-                curr_match_texts.append(match.group(i))
-                curr_match_spans.append(match.regs[i])
-            #check spans:
-            for i in range(1, len(curr_match_spans), 2):
-                curr_end = curr_match_spans[i][1]
-                prev_start = curr_match_spans[i-1][0]
-                line_len = curr_end-prev_start+1
-                if  min_row_len <= line_len <= max_row_len:
-                    continue
-            start = curr_match_spans[0]
-            expansion_from_start = expand_passage_left(start, text, 12)
-            curr_match_texts = [text[expansion_from_start:start[0]]] + curr_match_texts
-            end = curr_match_spans[-1]
-            expansion_from_end = expand_passage_right(end, text, 12)
-            curr_match_texts.append(text[end[1]:expansion_from_end])
-            all_texts.append([curr_match_texts])
-            all_start_spans.append([start[0]])
-        for s in all_start_spans:
-            for i in range(len(s)):
-                line_index = text[:s[i]].count("\n")
-                s[i] = line_index
-        all_pages[text_name] = (all_texts, num_res, all_start_spans)
-
-    if all_pages:
-        return all_pages
+            all_start_spans.append(match.span(0)[0])
+        all_pages_spans[text_name] = all_start_spans
+    if all_pages_spans:
+        return all_pages_spans
     else:
         return None
 
 
 
-def old_search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
+def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
     """Find passeges in text containing each string from strings_list in an ordered way and with a space of
     minimum window_l charcters and maximum window_r charcters inbetween each string. Return each passage represented as 
     a list of strings, which when combined together form the passege. Currently supports search in Hebrew text only.
@@ -388,11 +364,16 @@ def old_search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
         (list, int): list of lists representing grouped passages. Each group contains lists of strings which when combined
         together form a single passege - a result.
     """
-
+    spans_from_regex_search_all_pages = search_txt_regex(texts, strings_list, min_row_len, max_row_len)
+    if not spans_from_regex_search_all_pages:
+        return None
     all_pages = {}
     for text_name, text in texts.items():
+        spans_from_regex_search = spans_from_regex_search_all_pages[text_name]
+        if len(spans_from_regex_search) == 0:
+            continue
         #no_nikud_txt = remove_nikud(text)
-        spans_for_search = all_strings_spans(text, strings_list)
+        spans_for_search = all_strings_spans(text, strings_list, spans_from_regex_search, max_row_len)
         #spans_nikud = all_strings_spans(text, strings_list)
         # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
         if  spans_for_search == None:
@@ -406,9 +387,6 @@ def old_search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
             for same_sequence in final:
                 start_spans.append([x[1][0] for x in spans_for_search[0][i: i+len(same_sequence)]])
                 i += len(same_sequence)
-            #for s in spans_for_search:
-                #start_span = [x[1][0] for x in s]
-                #start_spans.append(start_span)
         else:
             result = search_rec_raw(
                 min_row_len, max_row_len, spans_for_search[0], spans_for_search, 0)
