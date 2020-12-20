@@ -410,7 +410,10 @@ def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
         all_pages[text_name] = (final, num_res, start_spans)
 
     if all_pages:
-        return sort_results_by_average_line_length(all_pages)
+        if len(strings_list) != 1:
+            return sort_results_by_average_line_length(all_pages)
+        else:
+            return all_pages
     else:
         return None
 
