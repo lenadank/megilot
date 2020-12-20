@@ -106,15 +106,18 @@ def all_strings_spans(text, strings_list, spans_from_regex, max_row_len):
             or None if one of the strings wasn't found. (one of the lists is empty).
     """
     result = []
-    for span_from_regex in spans_from_regex:
-        curr_text = text[span_from_regex: span_from_regex + max_row_len*(len(strings_list) + 1)]
-        for string in strings_list:
-            cur = single_string_spans(curr_text, string, offset=span_from_regex)
-            if cur:
-                result.append(cur)
-            else:  # one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
-                return None
-        return result
+    for string in strings_list:
+        cur = []
+        for span_from_regex in spans_from_regex:
+            curr_text = text[span_from_regex: span_from_regex + max_row_len*(len(strings_list) + 1)]
+            res_for_span = single_string_spans(curr_text, string, offset=span_from_regex)
+            res_for_span = [(x+len(cur), y) for x,y in res_for_span] #fixt enumerations, since pre list always starts from 0
+            cur += res_for_span
+        if cur:
+            result.append(cur)
+        else:  # one of the strings in strings_list wasn't found in text. In that case, there are no results for the search.
+            return None
+    return result
 
 
 def search_rec_raw(window_l, window_r, cur_string_spans, all_strings_spans, i):
@@ -272,6 +275,8 @@ def indices_to_text(indices, all_string_spans_list, text):
         res.append(text[cur_span[1]:next_span[0]])
     res.append(text[next_span[0]:next_span[1]])
 
+
+    res_len = sum(len(x) for x in res)
     # right expantion
     end_span = all_string_spans_list[-1][indices[-1]][1]
     right_index = expand_passage_right(end_span, text)
@@ -338,15 +343,15 @@ def search_txt_regex(texts, strings_list,min_row_len, max_row_len):
     all_pages_spans = {}
     num_res = 0
     for text_name, text in texts.items():
+        text_clean = text.replace("\n", " ")
         all_start_spans = []
-        for match in p.finditer(text):
+        for match in p.finditer(text_clean):
             all_start_spans.append(match.span(0)[0])
         all_pages_spans[text_name] = all_start_spans
     if all_pages_spans:
         return all_pages_spans
     else:
         return None
-
 
 
 def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
@@ -367,13 +372,16 @@ def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
     spans_from_regex_search_all_pages = search_txt_regex(texts, strings_list, min_row_len, max_row_len)
     if not spans_from_regex_search_all_pages:
         return None
+    #if sum(len(x) for x in spans_from_regex_search_all_pages.value()) > 500:
+    #    return "too_many_results"
     all_pages = {}
     for text_name, text in texts.items():
+        text_clean = text.replace("\n", " ")
         spans_from_regex_search = spans_from_regex_search_all_pages[text_name]
         if len(spans_from_regex_search) == 0:
             continue
         #no_nikud_txt = remove_nikud(text)
-        spans_for_search = all_strings_spans(text, strings_list, spans_from_regex_search, max_row_len)
+        spans_for_search = all_strings_spans(text_clean, strings_list, spans_from_regex_search, max_row_len)
         #spans_nikud = all_strings_spans(text, strings_list)
         # all_strings_spans() returned None -> indicates one of the strings wasn't found, thus no results can be found.
         if  spans_for_search == None:
@@ -381,7 +389,7 @@ def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
 
         if len(strings_list) == 1:
 
-            final, num_res = single_string_search(spans_for_search, text)
+            final, num_res = single_string_search(spans_for_search, text_clean)
             start_spans = []
             i = 0
             for same_sequence in final:
@@ -392,7 +400,7 @@ def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
                 min_row_len, max_row_len, spans_for_search[0], spans_for_search, 0)
             # result isn't an empty list -> some results were found.
             if result:
-                final, num_res, start_spans = get_final_results(result, spans_for_search, text)
+                final, num_res, start_spans = get_final_results(result, spans_for_search, text_clean)
             else:  # result is an empty list -> no results for the search.
                 continue
         for s in start_spans:
@@ -402,6 +410,39 @@ def search_txt(texts, strings_list, min_row_len, max_row_len, index=True):
         all_pages[text_name] = (final, num_res, start_spans)
 
     if all_pages:
-        return all_pages
+        return sort_results_by_average_line_length(all_pages)
     else:
         return None
+
+
+def calc_average_line_length_for_single_results(single_res):
+    curr_lengths = []
+    for i in range(1, len(single_res)-2, 2): # we are not intersted in the last matched line because the length constraints don't apply to it.
+        curr_lengths.append(len(single_res[i] + single_res[i + 1]))
+    return max(curr_lengths) - min(curr_lengths)
+
+def calc_average_line_length_for_passage(single_passage):
+    texts = single_passage[0]
+    all_lengths = []
+    for text in texts:
+        all_lengths.append(calc_average_line_length_for_single_results(text))
+    return min(all_lengths)
+
+def sort_results_by_average_line_length(all_pages):
+    for text_name in all_pages:
+        curr_res = all_pages[text_name]
+        zipped = zip(curr_res[0], curr_res[2])
+        sorted_zipped = sorted(zipped, key=calc_average_line_length_for_passage)
+        sorted_zipped = sort_internally_for_each_passage(sorted_zipped)
+        texts, spans = zip(*sorted_zipped)
+        all_pages[text_name] = (texts, curr_res[1], spans)
+    return all_pages
+
+def sort_internally_for_each_passage(zipped):
+    new_zipped = []
+    for passage_tuple in zipped:
+        zipped_passage = zip(passage_tuple[0], passage_tuple[1])
+        sorted_zipped_passage = sorted(zipped_passage, key=lambda x: calc_average_line_length_for_single_results(x[0]))
+        texts, spans = zip(*sorted_zipped_passage)
+        new_zipped.append((texts, spans))
+    return new_zipped

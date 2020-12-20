@@ -159,7 +159,9 @@ def searchResult():
             results = sutils.search_txt(
                 texts, strings_list, window_l, window_r)
             if results == None:
-                return render_template('results.html', letters=strings, window_r=window[1], txt_length=txt_length, title='Search Results', header="תוצאות חיפוש", result=results, is_main=False, filenames=None, cur_page=None)
+                return render_template('results.html', letters=strings, min_row_len = window[0], max_row_len=window[1],
+                                       title='Search Results', txt_length=txt_length, header="תוצאות חיפוש", result=results,
+                                       is_main=False, filenames=None, cur_page=None, message="לא נמצאו תוצאות")
             try:
                 pickle_out = open(pickled_res_path, 'wb')
             except Exception as e:

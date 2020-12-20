@@ -74,7 +74,7 @@
         <!--END OF search side-bar -->
         {% if result is none %}
         <div class='col-10 text-center' dir='rtl'>
-            <h1>לא נמצאו תוצאות</h1>
+            <h1>{{message}}</h1>
         </div>
         {% else %}
         <!--Search results grid-->
@@ -107,7 +107,7 @@
                                         {% if i is divisibleby 2 -%}
                                         <span>{{group[0][i]}}</span>
                                         {%- else -%}
-                                        <span class="font-weight-bold">{{group[0][i]}}</span>
+                                        <span class="font-weight-bold"><br>{{group[0][i]}}</span>
                                         {%- endif %}
                                         {%- endfor %}
                                     </p>
@@ -136,7 +136,7 @@
                                         {% if j is divisibleby 2 -%}
                                         <span>{{group[result_loop.index][j]}}</span>
                                         {%- else -%}
-                                        <span class="font-weight-bold">{{group[result_loop.index][j]}}</span>
+                                        <span class="font-weight-bold"><br>{{group[result_loop.index][j]}}</span>
                                         {%- endif %}
                                         {%- endfor %}
                                     </p>
