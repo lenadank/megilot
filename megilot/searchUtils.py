@@ -70,7 +70,7 @@ def build_single_string_regex(string):
                                                                  "]?")  # should be .{0,3}, but because of the hebrew script we switched the location of the dot.
     return string
 
-def single_string_spans(text, string, offset = 0):
+def single_string_spans(text, string, offset = 0, already_seen=None):
     """Get enumperated spans of apearances of a single string in text. 
 
     Args:
@@ -88,8 +88,12 @@ def single_string_spans(text, string, offset = 0):
     matches = p.finditer(text)
     def add_offset_to_span(span, offset):
         return (span[0] + offset, span[1] + offset)
-    res = list(enumerate([add_offset_to_span(match.span(), offset) for match in matches]))
-
+    res = [add_offset_to_span(match.span(), offset) for match in matches]
+    if already_seen is not None:
+        #avoid duplicate spans from overlapping regex search results
+        res = [x for x in res if x not in already_seen]
+        already_seen.update(res)
+    res = list(enumerate(res))
     return res
 
 
@@ -107,10 +111,11 @@ def all_strings_spans(text, strings_list, spans_from_regex, max_row_len):
     """
     result = []
     for string in strings_list:
+        spans_for_string = set()
         cur = []
         for span_from_regex in spans_from_regex:
             curr_text = text[span_from_regex: span_from_regex + max_row_len*(len(strings_list) + 1)]
-            res_for_span = single_string_spans(curr_text, string, offset=span_from_regex)
+            res_for_span = single_string_spans(curr_text, string, offset=span_from_regex, already_seen=spans_for_string)
             res_for_span = [(x+len(cur), y) for x,y in res_for_span] #fixt enumerations, since pre list always starts from 0
             cur += res_for_span
         if cur:

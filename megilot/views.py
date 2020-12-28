@@ -109,10 +109,11 @@ def save_results_to_csv(results, csv_file_name):
     with open(csv_file_name, mode='w', encoding="utf8") as results_file:
         results_writer = csv.writer(results_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for f, lines in results.items():
-            for line in lines[0]:
+            for i,line in enumerate(lines[0]):
                 for l in line:
                     l = ["*" + x + "*" if i%2 ==1 else x for i, x in enumerate(l) ]
-                    results_writer.writerow([f, " ".join(l).replace("\r\n", " ").replace("\n", " ")])
+                    verse_title = "" if lines[2] is None else lines[2][i]
+                    results_writer.writerow([f, verse_title, " ".join(l).replace("\r\n", " ").replace("\n", " ")])
 
 
 
@@ -173,7 +174,6 @@ def searchResult():
             else: #pickle the new results
                 pickle.dump(results, pickle_out)
                 pickle_out.close()
-        save_results_to_csv(results, csv_results_path)
         filenames = sorted(list(results.keys()))
         page = request.args.get('page', filenames[0], type=str)
         cur_res = results.get(page)
@@ -188,7 +188,8 @@ def searchResult():
                 break
         else:
             cur_res = (cur_res[0], cur_res[1], None)
-
+        results[page] = cur_res
+        save_results_to_csv({page: cur_res}, csv_results_path)
         csv_results_path = "../static/" + csv_results_path.split("static/")[1]
         return render_template('results.html', letters=strings,
                                min_row_len = window[0], max_row_len=window[1], txt_length=txt_length, title='Search Results',
