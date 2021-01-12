@@ -112,7 +112,7 @@ def save_results_to_csv(results, csv_file_name):
             for i,line in enumerate(lines[0]):
                 for l in line:
                     l = ["*" + x + "*" if i%2 ==1 else x for i, x in enumerate(l) ]
-                    verse_title = "" if lines[2] is None else lines[2][i]
+                    verse_title = "" if lines[2] is None else lines[2][i][0]
                     results_writer.writerow([f, verse_title, " ".join(l).replace("\r\n", " ").replace("\n", " ")])
 
 
